@@ -205,8 +205,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
                         `过期时间: ${new Date(email.expiresAt).toLocaleString()}`
                       )}
                     </div>
-                  </div>
-                  {/* 删除按钮已被移除，用户无法删除邮箱 */}
                 </div>
               ))}
               {loadingMore && (
@@ -222,6 +220,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
           )}
         </div>
       </div>
+
       <AlertDialog open={!!emailToDelete} onOpenChange={() => setEmailToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -243,4 +242,4 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
       </AlertDialog>
     </>
   )
-}
+} 
