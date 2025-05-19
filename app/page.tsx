@@ -21,11 +21,11 @@ export default async function Home() {
               <div className="space-y-4">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-wider">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-                    MRI大学Email
+                    MRI University Email System
                   </span>
                 </h1>
                 <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 tracking-wide">
-                  系统基于@beilunyang/moemail萌萌哒临时邮箱服务修改
+                  本系统基于@beilunyang/moemail萌萌哒临时邮箱服务修改
                 </p>
               </div>
 
