@@ -232,26 +232,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
           )}
         </div>
       </div>
-
-      <AlertDialog open={!!emailToDelete} onOpenChange={() => setEmailToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>
-              确定要删除邮箱 {emailToDelete?.address} 吗？此操作将同时删除该邮箱中的所有邮件，且不可恢复。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={() => emailToDelete && handleDelete(emailToDelete)}
-            >
-              删除
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 } 
