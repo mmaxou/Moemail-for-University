@@ -51,7 +51,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loadingMore, setLoadingMore] = useState(false)
   const [total, setTotal] = useState(0)
-  const [emailToDelete, setEmailToDelete] = useState<Email | null>(null)
+  const [emailToDelete, setEmailToDelete] = useState<Email | null>(null) // 状态保留，但不会被按钮设置
   const { toast } = useToast()
 
   const fetchEmails = async (cursor?: string) => {
@@ -116,6 +116,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
     if (session) fetchEmails()
   }, [session])
 
+  // handleDelete 函数仍然保留，只是删除按钮不再调用 setEmailToDelete 来触发它
   const handleDelete = async (email: Email) => {
     try {
       const response = await fetch(`/api/emails/${email.id}`, {
@@ -210,9 +211,12 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
                     variant="ghost"
                     size="icon"
                     className="opacity-0 group-hover:opacity-100 h-8 w-8"
+                    // 修改点：移除了 setEmailToDelete(email) 的调用
                     onClick={(e) => {
-                      e.stopPropagation()
-                      setEmailToDelete(email)
+                      e.stopPropagation(); // 仍然阻止事件冒泡
+                      // 此处不再执行任何操作，因此点击后无反应
+                      // setEmailToDelete(email) // 原来的这行被注释或删除
+                      console.log("删除按钮被点击，但无操作。邮箱ID:", email.id); // 可以保留一个log用于调试，确认点击事件被触发
                     }}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -233,6 +237,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
         </div>
       </div>
 
+      {/* AlertDialog 仍然保留在代码中，但由于 emailToDelete 状态不会被设置，它不会被打开 */}
       <AlertDialog open={!!emailToDelete} onOpenChange={() => setEmailToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -254,4 +259,4 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
       </AlertDialog>
     </>
   )
-} 
+}
