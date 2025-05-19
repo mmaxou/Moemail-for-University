@@ -4,5 +4,8 @@ export interface ExpiryOption {
 }
 
 export const EXPIRY_OPTIONS: ExpiryOption[] = [
+ { label: '永久', value: 0 },
+ { label: '永久', value: 0 },
+ { label: '永久', value: 0 },
  { label: '永久', value: 0 }
 ]
