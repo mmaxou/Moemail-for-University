@@ -205,6 +205,18 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
                         `过期时间: ${new Date(email.expiresAt).toLocaleString()}`
                       )}
                     </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="opacity-0 group-hover:opacity-100 h-8 w-8"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setEmailToDelete(email)
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
               ))}
               {loadingMore && (
