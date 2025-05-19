@@ -206,17 +206,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
                       )}
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 h-8 w-8"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setEmailToDelete(email)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  {/* 删除按钮已被移除，用户无法删除邮箱 */}
                 </div>
               ))}
               {loadingMore && (
@@ -232,25 +222,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
           )}
         </div>
       </div>
-      <AlertDialog open={!!emailToDelete} onOpenChange={() => setEmailToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>
-              确定要删除邮箱 {emailToDelete?.address} 吗？此操作将同时删除该邮箱中的所有邮件，且不可恢复。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={() => emailToDelete && handleDelete(emailToDelete)}
-            >
-              删除
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* 删除对话框也可以移除，因为已经没有删除功能 */}
     </>
   )
-} 
+}
