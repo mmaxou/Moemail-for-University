@@ -69,7 +69,8 @@ export function PromotePanel() {
       } else {
         setSearchError("未找到用户")
       }
-    } catch (_) { // 使用单个下划线作为变量名，表示忽略该变量
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) { 
       setSearchError("查询失败，请稍后重试")
     } finally {
       setLoading(false)
