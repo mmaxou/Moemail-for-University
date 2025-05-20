@@ -1,431 +1,256 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
+import { Gem, Sword, User2, Loader2, AlertCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Key, Plus, Loader2, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react"
+import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { ROLES, Role } from "@/lib/permissions"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { useCopy } from "@/hooks/use-copy"
-import { useRolePermission } from "@/hooks/use-role-permission"
-import { PERMISSIONS } from "@/lib/permissions"
-import { useConfig } from "@/hooks/use-config"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
-type ApiKey = {
-  id: string
-  name: string
-  key: string
-  createdAt: string
-  expiresAt: string | null
-  enabled: boolean
-}
+const roleIcons = {
+  [ROLES.DUKE]: Gem,
+  [ROLES.KNIGHT]: Sword,
+  [ROLES.CIVILIAN]: User2,
+} as const
 
-export function ApiKeyPanel() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
+const roleNames = {
+  [ROLES.DUKE]: "公爵",
+  [ROLES.KNIGHT]: "骑士",
+  [ROLES.CIVILIAN]: "平民",
+  [ROLES.EMPEROR]: "皇帝",
+} as const
+
+type RoleWithoutEmperor = Exclude<Role, typeof ROLES.EMPEROR>
+
+export function PromotePanel() {
+  const [searchText, setSearchText] = useState("")
   const [loading, setLoading] = useState(false)
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  const [newKeyName, setNewKeyName] = useState("")
-  const [newKey, setNewKey] = useState<string | null>(null)
+  const [targetRole, setTargetRole] = useState<RoleWithoutEmperor>(ROLES.KNIGHT)
   const { toast } = useToast()
-  const { copyToClipboard } = useCopy()
-  const [showExamples, setShowExamples] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const { checkPermission } = useRolePermission()
-  const canManageApiKey = checkPermission(PERMISSIONS.MANAGE_API_KEY)
+  const [foundUser, setFoundUser] = useState<{
+    id: string;
+    name?: string;
+    username?: string;
+    email?: string;
+    role?: string;
+  } | null>(null)
+  const [searchError, setSearchError] = useState<string | null>(null)
 
-  const fetchApiKeys = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const res = await fetch("/api/api-keys")
-      if (!res.ok) throw new Error("获取 API Keys 失败")
-      
-      const data = await res.json() as { apiKeys: ApiKey[] }
-      setApiKeys(data.apiKeys || [])
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
+  // 定义API响应类型
+  type SearchResponse = {
+    error?: string;
+    user?: {
+      id: string;
+      name?: string;
+      username?: string;
+      email?: string;
+      role?: string;
+    };
+  };
 
-  useEffect(() => {
-    if (canManageApiKey) {
-      fetchApiKeys()
-    }
-  }, [canManageApiKey, fetchApiKeys])
-
-  const { config } = useConfig()
-
-  const createApiKey = async () => {
-    if (!newKeyName.trim()) return
-
+  // 简单搜索用户，不使用debounce
+  const handleSearch = async () => {
+    if (!searchText.trim()) return
+    
     setLoading(true)
+    setFoundUser(null)
+    setSearchError(null)
+
     try {
-      const res = await fetch("/api/api-keys", {
+      const res = await fetch("/api/roles/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newKeyName })
+        body: JSON.stringify({ searchText })
       })
+      const data: SearchResponse = await res.json()
 
-      if (!res.ok) throw new Error("创建 API Key 失败")
+      if (!res.ok) {
+        setSearchError(data.error || "查询失败")
+        return
+      }
 
-      const data = await res.json() as { key: string }
-      setNewKey(data.key)
-      fetchApiKeys()
-    } catch (error) {
-      toast({
-        title: "创建失败",
-        description: error instanceof Error ? error.message : "请稍后重试",
-        variant: "destructive"
-      })
-      setCreateDialogOpen(false)
+      if (data.user) {
+        setFoundUser(data.user)
+      } else {
+        setSearchError("未找到用户")
+      }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) { 
+      setSearchError("查询失败，请稍后重试")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleDialogClose = () => {
-    setCreateDialogOpen(false)
-    setNewKeyName("")
-    setNewKey(null)
-  }
+  const handleAction = async () => {
+    if (!searchText || !foundUser) return
 
-  const toggleApiKey = async (id: string, enabled: boolean) => {
+    setLoading(true)
     try {
-      const res = await fetch(`/api/api-keys/${id}`, {
-        method: "PATCH",
+      if (foundUser.role === targetRole) {
+        toast({
+          title: `用户已是${roleNames[targetRole as keyof typeof roleNames]}`,
+          description: "无需重复设置",
+        })
+        setLoading(false)
+        return
+      }
+
+      const promoteRes = await fetch("/api/roles/promote", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled })
+        body: JSON.stringify({
+          userId: foundUser.id,
+          roleName: targetRole
+        })
       })
 
-      if (!res.ok) throw new Error("更新失败")
+      if (!promoteRes.ok) {
+        const errorData: {error?: string} = await promoteRes.json()
+        throw new Error(errorData.error || "设置失败")
+      }
 
-      setApiKeys(keys =>
-        keys.map(key =>
-          key.id === id ? { ...key, enabled } : key
-        )
-      )
-    } catch (error) {
-      console.error(error)
       toast({
-        title: "更新失败",
-        description: "更新 API Key 状态失败",
+        title: "设置成功",
+        description: `已将用户 ${foundUser.username || foundUser.email} 设为${roleNames[targetRole as keyof typeof roleNames]}`,
+      })
+      
+      // 刷新用户信息
+      setFoundUser({
+        ...foundUser,
+        role: targetRole
+      })
+    } catch (error) {
+      toast({
+        title: "设置失败",
+        description: error instanceof Error ? error.message : "请稍后重试",
         variant: "destructive"
       })
+    } finally {
+      setLoading(false)
     }
   }
 
-  const deleteApiKey = async (id: string) => {
-    try {
-      const res = await fetch(`/api/api-keys/${id}`, {
-        method: "DELETE"
-      })
-
-      if (!res.ok) throw new Error("删除失败")
-
-      setApiKeys(keys => keys.filter(key => key.id !== id))
-      toast({
-        title: "删除成功",
-        description: "API Key 已删除"
-      })
-    } catch (error) {
-      console.error(error)
-      toast({
-        title: "删除失败",
-        description: "删除 API Key 失败",
-        variant: "destructive"
-      })
+  const renderUserInfo = () => {
+    if (!foundUser) return null
+    
+    let roleName = "未设置"
+    if (foundUser.role && roleNames[foundUser.role as keyof typeof roleNames]) {
+      roleName = roleNames[foundUser.role as keyof typeof roleNames]
     }
+
+    return (
+      <div className="mb-4 bg-primary/5 border border-primary/20 rounded-lg p-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-sm">
+            <strong>用户名：</strong>
+            <span>{foundUser.username || foundUser.email}</span>
+          </div>
+          {foundUser.name && (
+            <div className="flex items-center gap-2 text-sm">
+              <strong>昵称：</strong>
+              <span>{foundUser.name}</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2 text-sm">
+            <strong>当前角色：</strong>
+            <span>{roleName}</span>
+          </div>
+        </div>
+      </div>
+    )
   }
+
+  // 使用类型断言确保图标类型安全
+  const Icon = roleIcons[targetRole as keyof typeof roleIcons]
 
   return (
-    <div className="bg-background rounded-lg border-2 border-primary/20 p-6 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Key className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-semibold">API Keys</h2>
-        </div>
-        {
-          canManageApiKey && (
-            <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2" onClick={() => setCreateDialogOpen(true)}>
-                  <Plus className="w-4 h-4" />
-                  创建 API Key
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {newKey ? "API Key 创建成功" : "创建新的 API Key"}
-                  </DialogTitle>
-                  {newKey && (
-                    <DialogDescription className="text-destructive">
-                      请立即保存此密钥，它只会显示一次且无法恢复
-                    </DialogDescription>
-                  )}
-                </DialogHeader>
-
-                {!newKey ? (
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label>名称</Label>
-                      <Input
-                        value={newKeyName}
-                        onChange={(e) => setNewKeyName(e.target.value)}
-                        placeholder="为你的 API Key 起个名字"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label>API Key</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          value={newKey}
-                          readOnly
-                          className="font-mono text-sm"
-                        />
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => copyToClipboard(newKey)}
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button
-                      variant="outline"
-                      onClick={handleDialogClose}
-                      disabled={loading}
-                    >
-                      {newKey ? "完成" : "取消"}
-                    </Button>
-                  </DialogClose>
-                  {!newKey && (
-                    <Button
-                      onClick={createApiKey}
-                      disabled={loading || !newKeyName.trim()}
-                    >
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        "创建"
-                      )}
-                    </Button>
-                  )}
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )
-        }
+    <div className="bg-background rounded-lg border-2 border-primary/20 p-6">
+      <div className="flex items-center gap-2 mb-6">
+        <Icon className="w-5 h-5 text-primary" />
+        <h2 className="text-lg font-semibold">角色管理</h2>
       </div>
 
-      {
-        !canManageApiKey ? (
-          <div className="text-center text-muted-foreground py-8">
-            <p>需要公爵或更高权限才能管理 API Key</p>
-            <p className="mt-2">请联系网站管理员升级您的角色</p>
-            {
-              config?.adminContact && (
-                <p className="mt-2">管理员联系方式：{config.adminContact}</p>
-              )
-            }
+      <div className="space-y-4">
+        {/* 用户信息显示区域 */}
+        {foundUser && renderUserInfo()}
+
+        {/* 错误信息 */}
+        {searchError && (
+          <div className="mb-4 bg-destructive/10 border border-destructive text-destructive rounded-lg p-4 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <div className="text-sm">
+              {searchError}
+            </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="text-center py-8 space-y-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Loader2 className="w-6 h-6 text-primary animate-spin" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">加载中...</p>
-                </div>
-              </div>
-            ) : apiKeys.length === 0 ? (
-              <div className="text-center py-8 space-y-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Key className="w-6 h-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium">没有 API Keys</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    点击上方的创建 &quot;API Key&quot; 按钮来创建你的第一个 API Key
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                {apiKeys.map((key) => (
-                  <div
-                    key={key.id}
-                    className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                  >
-                    <div className="space-y-1">
-                      <div className="font-medium">{key.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        创建于 {new Date(key.createdAt).toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={key.enabled}
-                        onCheckedChange={(checked) => toggleApiKey(key.id, checked)}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteApiKey(key.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+        )}
 
-                <div className="mt-8 space-y-4">
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    onClick={() => setShowExamples(!showExamples)}
-                  >
-                    {showExamples ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    查看使用文档
-                  </button>
-
-                  {showExamples && (
-                    <div className="rounded-lg border bg-card p-4 space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">生成临时邮箱</div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(
-                              `curl -X POST ${window.location.protocol}//${window.location.host}/api/emails/generate \\
-  -H "X-API-Key: YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "name": "test",
-    "expiryTime": 3600000,
-    "domain": "moemail.app"
-  }'`
-                            )}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <pre className="text-xs bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                          {`curl -X POST ${window.location.protocol}//${window.location.host}/api/emails/generate \\
-  -H "X-API-Key: YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "name": "test",
-    "expiryTime": 3600000,
-    "domain": "moemail.app"
-  }'`}
-                        </pre>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">获取邮箱列表</div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(
-                              `curl ${window.location.protocol}//${window.location.host}/api/emails?cursor=CURSOR \\
-  -H "X-API-Key: YOUR_API_KEY"`
-                            )}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <pre className="text-xs bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                          {`curl ${window.location.protocol}//${window.location.host}/api/emails?cursor=CURSOR \\
-  -H "X-API-Key: YOUR_API_KEY"`}
-                        </pre>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">获取邮件列表</div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(
-                              `curl ${window.location.protocol}//${window.location.host}/api/emails/{emailId}?cursor=CURSOR \\
-  -H "X-API-Key: YOUR_API_KEY"`
-                            )}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <pre className="text-xs bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                          {`curl ${window.location.protocol}//${window.location.host}/api/emails/{emailId}?cursor=CURSOR \\
-  -H "X-API-Key: YOUR_API_KEY"`}
-                        </pre>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-medium">获取单封邮件</div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => copyToClipboard(
-                              `curl ${window.location.protocol}//${window.location.host}/api/emails/{emailId}/{messageId} \\
-  -H "X-API-Key: YOUR_API_KEY"`
-                            )}
-                          >
-                            <Copy className="w-4 h-4" />
-                          </Button>
-                        </div>
-                        <pre className="text-xs bg-muted/50 rounded-lg p-4 overflow-x-auto">
-                          {`curl ${window.location.protocol}//${window.location.host}/api/emails/{emailId}/{messageId} \\
-  -H "X-API-Key: YOUR_API_KEY"`}
-                        </pre>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground mt-4">
-                        <p>注意：</p>
-                        <ul className="list-disc list-inside space-y-1 mt-2">
-                          <li>请将 YOUR_API_KEY 替换为你的实际 API Key</li>
-                          <li>emailId 是邮箱的唯一标识符</li>
-                          <li>messageId 是邮件的唯一标识符</li>
-                          <li>expiryTime 是邮箱的有效期（毫秒），可选值：3600000（1小时）、86400000（1天）、604800000（7天）、0（永久）</li>
-                          <li>domain 是邮箱域名，可通过 /api/emails/domains 获取可用域名列表</li>
-                          <li>cursor 用于分页，从上一次请求的响应中获取 nextCursor</li>
-                          <li>所有请求都需要包含 X-API-Key 请求头</li>
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+        <div className="flex gap-4">
+          <div className="flex-1">
+            <Input
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="输入用户名或邮箱"
+              disabled={loading}
+            />
           </div>
-        )
-      }
+          <Button 
+            onClick={handleSearch}
+            disabled={!searchText.trim() || loading}
+            size="sm"
+          >
+            查询
+          </Button>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <div className="text-sm">设置为：</div>
+          <Select value={targetRole} onValueChange={(value) => setTargetRole(value as RoleWithoutEmperor)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ROLES.DUKE}>
+                <div className="flex items-center gap-2">
+                  <Gem className="w-4 h-4" />
+                  公爵
+                </div>
+              </SelectItem>
+              <SelectItem value={ROLES.KNIGHT}>
+                <div className="flex items-center gap-2">
+                  <Sword className="w-4 h-4" />
+                  骑士
+                </div>
+              </SelectItem>
+              <SelectItem value={ROLES.CIVILIAN}>
+                <div className="flex items-center gap-2">
+                  <User2 className="w-4 h-4" />
+                  平民
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          onClick={handleAction}
+          disabled={loading || !searchText.trim() || !foundUser}
+          className="w-full"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            `设为${roleNames[targetRole as keyof typeof roleNames]}`
+          )}
+        </Button>
+      </div>
     </div>
   )
 } 
