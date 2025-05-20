@@ -69,7 +69,7 @@ export function PromotePanel() {
       } else {
         setSearchError("未找到用户")
       }
-    } catch (error) {
+    } catch (_error) { // 使用下划线前缀表示故意不使用的变量
       setSearchError("查询失败，请稍后重试")
     } finally {
       setLoading(false)
@@ -100,8 +100,8 @@ export function PromotePanel() {
       })
 
       if (!promoteRes.ok) {
-        const error = await promoteRes.json()
-        throw new Error(error.error || "设置失败")
+        const errorData = await promoteRes.json()
+        throw new Error(errorData.error || "设置失败")
       }
 
       toast({
