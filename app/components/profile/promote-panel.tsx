@@ -1,9 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Gem, Sword, User2, Loader2 } from "lucide-react"
+import { Gem, Sword, User2, Loader2, AlertCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { ROLES, Role } from "@/lib/permissions"
 import {
@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const roleIcons = {
   [ROLES.DUKE]: Gem,
@@ -24,6 +25,7 @@ const roleNames = {
   [ROLES.DUKE]: "公爵",
   [ROLES.KNIGHT]: "骑士",
   [ROLES.CIVILIAN]: "平民",
+  [ROLES.EMPEROR]: "皇帝",
 } as const
 
 type RoleWithoutEmperor = Exclude<Role, typeof ROLES.EMPEROR>
@@ -33,40 +35,83 @@ export function PromotePanel() {
   const [loading, setLoading] = useState(false)
   const [targetRole, setTargetRole] = useState<RoleWithoutEmperor>(ROLES.KNIGHT)
   const { toast } = useToast()
+  const [foundUser, setFoundUser] = useState<{
+    id: string;
+    name?: string;
+    username?: string;
+    email?: string;
+    role?: string;
+  } | null>(null)
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 自动查询用户
+  useEffect(() => {
+    // 清除之前的定时器
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    // 重置用户信息和错误
+    if (!searchText.trim()) {
+      setFoundUser(null)
+      setSearchError(null)
+      return
+    }
+
+    // 设置500毫秒的延迟，避免频繁请求
+    searchTimeoutRef.current = setTimeout(async () => {
+      setLoading(true)
+      setFoundUser(null)
+      setSearchError(null)
+
+      try {
+        const res = await fetch("/api/roles/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ searchText })
+        })
+        const data = await res.json() as {
+          user?: {
+            id: string
+            name?: string
+            username?: string
+            email?: string
+            role?: string
+          }
+          error?: string
+        }
+
+        if (!res.ok) {
+          setSearchError(data.error || "查询失败")
+          return
+        }
+
+        if (data.user) {
+          setFoundUser(data.user)
+        } else {
+          setSearchError("未找到用户")
+        }
+      } catch (error) {
+        setSearchError("查询失败，请稍后重试")
+      } finally {
+        setLoading(false)
+      }
+    }, 500)
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [searchText])
 
   const handleAction = async () => {
-    if (!searchText) return
+    if (!searchText || !foundUser) return
 
     setLoading(true)
     try {
-      const res = await fetch("/api/roles/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ searchText })
-      })
-      const data = await res.json() as {
-        user?: {
-          id: string
-          name?: string
-          username?: string
-          email: string
-          role?: string
-        }
-        error?: string
-      }
-
-      if (!res.ok) throw new Error(data.error || "未知错误")
-
-      if (!data.user) {
-        toast({
-          title: "未找到用户",
-          description: "请确认用户名或邮箱地址是否正确",
-          variant: "destructive"
-        })
-        return
-      }
-
-      if (data.user.role === targetRole) {
+      if (foundUser.role === targetRole) {
         toast({
           title: `用户已是${roleNames[targetRole]}`,
           description: "无需重复设置",
@@ -78,7 +123,7 @@ export function PromotePanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: data.user.id,
+          userId: foundUser.id,
           roleName: targetRole
         })
       })
@@ -90,9 +135,14 @@ export function PromotePanel() {
 
       toast({
         title: "设置成功",
-        description: `已将用户 ${data.user.username || data.user.email} 设为${roleNames[targetRole]}`,
+        description: `已将用户 ${foundUser.username || foundUser.email} 设为${roleNames[targetRole]}`,
       })
-      setSearchText("")
+      
+      // 刷新用户信息
+      setFoundUser({
+        ...foundUser,
+        role: targetRole
+      })
     } catch (error) {
       toast({
         title: "设置失败",
@@ -114,12 +164,61 @@ export function PromotePanel() {
       </div>
 
       <div className="space-y-4">
+        {/* 用户信息显示区域 */}
+        {foundUser && (
+          <Alert className="mb-4 bg-primary/5 border-primary/20">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-sm">
+                <strong>用户名：</strong>
+                <span>{foundUser.username || foundUser.email}</span>
+              </div>
+              {foundUser.name && (
+                <div className="flex items-center gap-2 text-sm">
+                  <strong>昵称：</strong>
+                  <span>{foundUser.name}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-sm">
+                <strong>当前角色：</strong>
+                <span className="flex items-center gap-1">
+                  {foundUser.role ? (
+                    <>
+                      {roleNames[foundUser.role as keyof typeof roleNames] || "未知"}
+                      {roleIcons[foundUser.role as keyof typeof roleIcons] && (
+                        <span className="inline-block">
+                          {(() => {
+                            const RoleIcon = roleIcons[foundUser.role as keyof typeof roleIcons];
+                            return RoleIcon ? <RoleIcon className="w-4 h-4" /> : null;
+                          })()}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    "未设置"
+                  )}
+                </span>
+              </div>
+            </div>
+          </Alert>
+        )}
+
+        {/* 错误信息 */}
+        {searchError && searchText.trim() && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {searchError}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex gap-4">
           <div className="flex-1">
             <Input
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="输入用户名或邮箱"
+              disabled={loading}
             />
           </div>
           <Select value={targetRole} onValueChange={(value) => setTargetRole(value as RoleWithoutEmperor)}>
@@ -151,7 +250,7 @@ export function PromotePanel() {
 
         <Button
           onClick={handleAction}
-          disabled={loading || !searchText.trim()}
+          disabled={loading || !searchText.trim() || !foundUser}
           className="w-full"
         >
           {loading ? (
