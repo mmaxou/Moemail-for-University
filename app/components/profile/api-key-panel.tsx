@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Key, Plus, Loader2, Copy, Trash2, ChevronDown, ChevronUp } from "lucide-react"
@@ -44,29 +44,26 @@ export function ApiKeyPanel() {
   const { checkPermission } = useRolePermission()
   const canManageApiKey = checkPermission(PERMISSIONS.MANAGE_API_KEY)
 
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async () => {
+    setIsLoading(true)
     try {
       const res = await fetch("/api/api-keys")
       if (!res.ok) throw new Error("获取 API Keys 失败")
+      
       const data = await res.json() as { apiKeys: ApiKey[] }
-      setApiKeys(data.apiKeys)
+      setApiKeys(data.apiKeys || [])
     } catch (error) {
       console.error(error)
-      toast({
-        title: "获取失败",
-        description: "获取 API Keys 列表失败",
-        variant: "destructive"
-      })
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     if (canManageApiKey) {
       fetchApiKeys()
     }
-  }, [canManageApiKey])
+  }, [canManageApiKey, fetchApiKeys])
 
   const { config } = useConfig()
 
