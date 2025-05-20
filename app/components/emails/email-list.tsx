@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { CreateDialog } from "./create-dialog"
 import { Mail, RefreshCw, Trash2 } from "lucide-react"
@@ -54,13 +54,26 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [emailToDelete, setEmailToDelete] = useState<Email | null>(null) // 状态保留，但不会被按钮设置
   const { toast } = useToast()
 
-  const fetchEmails = async (cursor?: string) => {
+  const fetchEmails = useCallback(async (cursor?: string) => {
+    if (!session?.user?.id) return
+    
+    if (!cursor) {
+      setLoading(true)
+    } else {
+      setLoadingMore(true)
+    }
+
     try {
-      const url = new URL("/api/emails", window.location.origin)
-      if (cursor) {
-        url.searchParams.set('cursor', cursor)
-      }
+      const url = cursor 
+        ? `/api/emails?cursor=${cursor}` 
+        : `/api/emails`
+      
       const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch emails")
+      }
+      
       const data = await response.json() as EmailResponse
       
       if (!cursor) {
@@ -92,7 +105,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
       setRefreshing(false)
       setLoadingMore(false)
     }
-  }
+  }, [emails, session?.user?.id])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -114,7 +127,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
 
   useEffect(() => {
     if (session) fetchEmails()
-  }, [session])
+  }, [session, fetchEmails])
 
   // handleDelete 函数仍然保留，只是删除按钮不再调用 setEmailToDelete 来触发它
   const handleDelete = async (email: Email) => {
