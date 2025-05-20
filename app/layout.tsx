@@ -8,24 +8,20 @@ import { Providers } from "./providers"
 import { FloatMenu } from "@/components/float-menu"
 
 export const metadata: Metadata = {
-  title: "MoeMail - 萌萌哒临时邮箱服务",
-  description: "安全、快速、一次性的临时邮箱地址，保护您的隐私，远离垃圾邮件。支持即时收件，到期自动失效。",
+  title: "MRI mail - University Email System",
+  description: "安全、快速的大学邮件系统，保护您的隐私，远离垃圾邮件。支持即时收件。",
   keywords: [
-    "临时邮箱",
-    "一次性邮箱",
-    "匿名邮箱",
+    "大学邮箱",
+    "邮件系统",
     "隐私保护",
     "垃圾邮件过滤",
     "即时收件",
-    "自动过期",
     "安全邮箱",
     "注册验证",
-    "临时账号",
-    "萌系邮箱",
     "电子邮件",
     "隐私安全",
     "邮件服务",
-    "MoeMail"
+    "MRI mail"
   ].join(", "),
   authors: [{ name: "SoftMoe Studio" }],
   creator: "SoftMoe Studio",
@@ -42,14 +38,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_CN",
     url: "https://moemail.app",
-    title: "MoeMail - 萌萌哒临时邮箱服务",
-    description: "安全、快速、一次性的临时邮箱地址，保护您的隐私，远离垃圾邮件。支持即时收件，到期自动失效。",
-    siteName: "MoeMail",
+    title: "MRI mail - University Email System",
+    description: "安全、快速的大学邮件系统，保护您的隐私，远离垃圾邮件。支持即时收件。",
+    siteName: "MRI mail",
   },
   twitter: {
     card: "summary_large_image",
-    title: "MoeMail - 萌萌哒临时邮箱服务",
-    description: "安全、快速、一次性的临时邮箱地址，保护您的隐私，远离垃圾邮件。支持即时收件，到期自动失效。",
+    title: "MRI mail - University Email System",
+    description: "安全、快速的大学邮件系统，保护您的隐私，远离垃圾邮件。支持即时收件。",
   },
   manifest: '/manifest.json',
   icons: [
@@ -73,10 +69,10 @@ export default function RootLayout({
   return (
     <html lang="zh" suppressHydrationWarning>
       <head>
-        <meta name="application-name" content="MoeMail" />
+        <meta name="application-name" content="MRI mail" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="MoeMail" />
+        <meta name="apple-mobile-web-app-title" content="MRI mail" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
