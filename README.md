@@ -1,7 +1,7 @@
 # MRI Mail
 
 <div align="center">
-  <h3>一个现代化的临时邮箱服务</h3>
+  <h3>一个现代化的邮局服务，基于MoeMail进行的二次开发</h3>
 </div>
 
 ## 关于本项目
