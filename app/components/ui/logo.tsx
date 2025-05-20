@@ -58,7 +58,7 @@ export function Logo() {
         </div>
       </div>
       <span className="font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
-        MoeMail
+        MRI mail
       </span>
     </Link>
   )
