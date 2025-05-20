@@ -155,10 +155,10 @@ export function LoginForm() {
     <Card className="w-[95%] max-w-lg border-2 border-primary/20">
       <CardHeader className="space-y-2">
         <CardTitle className="text-2xl text-center bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-          欢迎使用 MoeMail
+          欢迎使用MRI University Email System
         </CardTitle>
         <CardDescription className="text-center">
-          萌萌哒临时邮箱服务 (。・∀・)ノ
+          MRI University学生邮件系统
         </CardDescription>
       </CardHeader>
       <CardContent className="px-6">
