@@ -8,8 +8,6 @@
 
 本项目基于 [beilunyang/moemail](https://github.com/beilunyang/moemail) 的源代码，根据 MIT 协议进行二次开发。感谢原作者的优秀工作！
 
-MRI Mail 是一个功能强大的临时邮箱服务，提供简洁易用的界面和丰富的功能，适合开发测试、注册验证等多种场景。
-
 ## 功能特性
 
 ### 原有功能
