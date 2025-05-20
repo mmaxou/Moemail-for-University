@@ -51,12 +51,13 @@ const useConfigStore = create<ConfigStore>((set) => ({
 
 export function useConfig() {
   const store = useConfigStore()
+  const { config, loading, fetch } = store
 
   useEffect(() => {
-    if (!store.config && !store.loading) {
-      store.fetch()
+    if (!config && !loading) {
+      fetch()
     }
-  }, [store.config, store.loading])
+  }, [config, loading, fetch])
 
   return store
 } 
