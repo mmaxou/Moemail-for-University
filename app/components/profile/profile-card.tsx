@@ -18,10 +18,10 @@ interface ProfileCardProps {
 }
 
 const roleConfigs = {
-  emperor: { name: '皇帝', icon: Crown },
-  duke: { name: '公爵', icon: Gem },
-  knight: { name: '骑士', icon: Sword },
-  civilian: { name: '平民', icon: User2 },
+  emperor: { name: '校长', icon: Crown },
+  duke: { name: '教授', icon: Gem },
+  knight: { name: '认证学生', icon: Sword },
+  civilian: { name: '未认证', icon: User2 },
 } as const
 
 export function ProfileCard({ user }: ProfileCardProps) {
