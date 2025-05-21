@@ -90,9 +90,9 @@ export function ConfigPanel() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ROLES.DUKE}>公爵</SelectItem>
-              <SelectItem value={ROLES.KNIGHT}>骑士</SelectItem>
-              <SelectItem value={ROLES.CIVILIAN}>平民</SelectItem>
+              <SelectItem value={ROLES.DUKE}>教授</SelectItem>
+              <SelectItem value={ROLES.KNIGHT}>认证学生</SelectItem>
+              <SelectItem value={ROLES.CIVILIAN}>未认证</SelectItem>
             </SelectContent>
           </Select>
         </div>
