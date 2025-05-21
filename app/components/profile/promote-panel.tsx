@@ -21,10 +21,10 @@ const roleIcons = {
 } as const
 
 const roleNames = {
-  [ROLES.DUKE]: "公爵",
-  [ROLES.KNIGHT]: "骑士",
-  [ROLES.CIVILIAN]: "平民",
-  [ROLES.EMPEROR]: "皇帝",
+  [ROLES.DUKE]: "教授",
+  [ROLES.KNIGHT]: "认证学生",
+  [ROLES.CIVILIAN]: "未认证",
+  [ROLES.EMPEROR]: "校长",
 } as const
 
 type RoleWithoutEmperor = Exclude<Role, typeof ROLES.EMPEROR>
@@ -220,19 +220,19 @@ export function PromotePanel() {
               <SelectItem value={ROLES.DUKE}>
                 <div className="flex items-center gap-2">
                   <Gem className="w-4 h-4" />
-                  公爵
+                  教授
                 </div>
               </SelectItem>
               <SelectItem value={ROLES.KNIGHT}>
                 <div className="flex items-center gap-2">
                   <Sword className="w-4 h-4" />
-                  骑士
+                  认证学生
                 </div>
               </SelectItem>
               <SelectItem value={ROLES.CIVILIAN}>
                 <div className="flex items-center gap-2">
                   <User2 className="w-4 h-4" />
-                  平民
+                  未认证
                 </div>
               </SelectItem>
             </SelectContent>
