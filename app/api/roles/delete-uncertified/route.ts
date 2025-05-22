@@ -1,6 +1,6 @@
 import { createDb } from "@/lib/db";
 import { users, userRoles, roles } from "@/lib/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { ROLES } from "@/lib/permissions";
 
 export const runtime = "edge";
@@ -42,10 +42,7 @@ export async function DELETE() {
     // 删除这些用户
     await db.delete(users)
       .where(
-        and(
-          // 确保用户ID在未认证用户列表中
-          userRoles.userId in userIds
-        )
+        inArray(users.id, userIds)
       );
 
     return Response.json({ 
