@@ -89,7 +89,7 @@ export function PromotePanel() {
       }
       
       const data = await response.json()
-      setRoleStats(data)
+      setRoleStats(data as RoleStats)
     } catch (error) {
       console.error("获取角色统计失败:", error)
     } finally {
