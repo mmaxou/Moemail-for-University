@@ -1,7 +1,7 @@
 # MRI Mail
 
 <div align="center">
-  <h3>一个现代化的邮局服务，基于MoeMail进行的二次开发</h3>
+  <h3>一个现代化的邮局服务，基于MoeMail修改</h3>
 </div>
 
 ## 关于本项目
@@ -17,16 +17,19 @@
 - API 接口支持，便于系统集成
 - Webhook 集成支持
 
-### 新增功能
-- **用户查询**：管理员可以通过用户名或邮箱搜索并管理用户
-- **固定邮箱限制**：固定用户只能创建一个永久邮箱，保证资源合理利用
-- **邮箱保护**：防止用户误删除重要邮箱
+### 修改&新增功能
+#### 管理员端
+- **用户查询**：现在可以通过搜索查看用户名及等级
+- **用户数量统计**：查看当前邮箱注册/各等级人数，支持一键删除最低等级（未授权）的账户
+- **禁用邮箱删除功能**：用户无法自主删除已经注册的邮箱
+- **默认邮箱时限**：目前只能创建永久时限的邮箱，可以替换[beilunyang/moemail](https://github.com/beilunyang/moemail)中的app/types/email.ts文件恢复
+#### 用户端
+- **邮件查询**：可以在邮件列表中输入关键词（发件人、邮件内容、邮件主题）自动检索对应的邮件
 
 ### 未来计划
-- 邮件发送功能
-- 更多自定义选项
-- 增强的安全特性
-- 性能优化
+- [ ] 接入SMTP Server新增发件功能
+- [ ] 接入Linux Do Connect
+- [ ] 更多的功能For Admin+Users
 
 ## 技术栈
 
@@ -35,8 +38,9 @@
 - 数据存储：Cloudflare KV, D1
 - 部署：Cloudflare Pages, Workers
 
-## 开发与贡献
-- 请前往 [beilunyang/moemail页面](https://github.com/beilunyang/moemail) 进行查看
+## 部署教程
+- 与Moemail一致，请前往 [beilunyang/moemail页面](https://github.com/beilunyang/moemail) 进行查看
+- 如已部署过Moemail，可直接下载源码覆盖部署
 
 ## 许可证
 
