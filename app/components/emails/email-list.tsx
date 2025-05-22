@@ -52,10 +52,12 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [total, setTotal] = useState(0)
   const [emailToDelete, setEmailToDelete] = useState<Email | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   const fetchEmails = useCallback(async (cursor?: string) => {
     try {
+      setError(null)
       if (!cursor) setLoading(true)
       else setLoadingMore(true)
       
@@ -64,24 +66,15 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
         url.searchParams.set('cursor', cursor)
       }
       const response = await fetch(url)
-      const data = await response.json() as EmailResponse
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || "加载邮箱失败")
+      }
       
       if (!cursor) {
-        const newEmails = data.emails
-        const oldEmails = emails
-
-        const lastDuplicateIndex = newEmails.findIndex(
-          newEmail => oldEmails.some(oldEmail => oldEmail.id === newEmail.id)
-        )
-
-        if (lastDuplicateIndex === -1) {
-          setEmails(newEmails)
-          setNextCursor(data.nextCursor)
-          setTotal(data.total)
-          return
-        }
-        const uniqueNewEmails = newEmails.slice(0, lastDuplicateIndex)
-        setEmails([...uniqueNewEmails, ...oldEmails])
+        setEmails(data.emails)
+        setNextCursor(data.nextCursor)
         setTotal(data.total)
         return
       }
@@ -90,12 +83,13 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
       setTotal(data.total)
     } catch (error) {
       console.error("Failed to fetch emails:", error)
+      setError(error instanceof Error ? error.message : "加载邮箱列表失败")
     } finally {
       setLoading(false)
       setRefreshing(false)
       setLoadingMore(false)
     }
-  }, [emails]);
+  }, []);
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -187,6 +181,13 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
         <div className="flex-1 overflow-auto p-2" onScroll={handleScroll}>
           {loading ? (
             <div className="text-center text-sm text-gray-500">加载中...</div>
+          ) : error ? (
+            <div className="text-center text-sm text-destructive p-2">
+              <div className="mb-2">{error}</div>
+              <Button variant="outline" size="sm" onClick={handleRefresh}>
+                重试
+              </Button>
+            </div>
           ) : emails.length > 0 ? (
             <div className="space-y-1">
               {emails.map(email => (
