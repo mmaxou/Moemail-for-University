@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import {Mail, Calendar, RefreshCw, Trash2} from "lucide-react"
+import {Mail, Calendar, RefreshCw, Trash2, Search} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useThrottle } from "@/hooks/use-throttle"
@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input"
 
 interface Message {
   id: string
@@ -46,16 +47,33 @@ export function MessageList({ email, onMessageSelect, selectedMessageId }: Messa
   const [refreshing, setRefreshing] = useState(false)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loadingMore, setLoadingMore] = useState(false)
-  const pollTimeoutRef = useRef<Timer>()
+  const pollTimeoutRef = useRef<NodeJS.Timeout>()
   const messagesRef = useRef<Message[]>([]) // 添加 ref 来追踪最新的消息列表
   const [total, setTotal] = useState(0)
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filteredMessages, setFilteredMessages] = useState<Message[]>([])
   const { toast } = useToast()
 
   // 当 messages 改变时更新 ref
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  // 当搜索条件变化时更新过滤后的消息列表
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredMessages(messages)
+      return
+    }
+    
+    const query = searchQuery.toLowerCase()
+    const filtered = messages.filter(message => 
+      message.subject.toLowerCase().includes(query) || 
+      message.from_address.toLowerCase().includes(query)
+    )
+    setFilteredMessages(filtered)
+  }, [searchQuery, messages])
 
   const fetchMessages = async (cursor?: string) => {
     try {
@@ -187,27 +205,42 @@ export function MessageList({ email, onMessageSelect, selectedMessageId }: Messa
   return (
   <>
     <div className="h-full flex flex-col">
-      <div className="p-2 flex justify-between items-center border-b border-primary/20">
+      <div className="p-2 flex items-center border-b border-primary/20 gap-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={handleRefresh}
           disabled={refreshing}
-          className={cn("h-8 w-8", refreshing && "animate-spin")}
+          className={cn("h-8 w-8 flex-shrink-0", refreshing && "animate-spin")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
-        <span className="text-xs text-gray-500">
-          {total > 0 ? `${total} 封邮件` : "暂无邮件"}
+        
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="搜索邮件..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8 h-8 text-sm"
+          />
+        </div>
+        
+        <span className="text-xs text-gray-500 flex-shrink-0">
+          {filteredMessages.length > 0 
+            ? searchQuery 
+              ? `${filteredMessages.length}/${total} 封邮件` 
+              : `${total} 封邮件` 
+            : "暂无邮件"}
         </span>
       </div>
 
       <div className="flex-1 overflow-auto" onScroll={handleScroll}>
         {loading ? (
           <div className="p-4 text-center text-sm text-gray-500">加载中...</div>
-        ) : messages.length > 0 ? (
+        ) : filteredMessages.length > 0 ? (
           <div className="divide-y divide-primary/10">
-            {messages.map(message => (
+            {filteredMessages.map(message => (
               <div
                 key={message.id}
                 onClick={() => onMessageSelect(message.id)}
@@ -250,7 +283,7 @@ export function MessageList({ email, onMessageSelect, selectedMessageId }: Messa
           </div>
         ) : (
           <div className="p-4 text-center text-sm text-gray-500">
-            暂无邮件
+            {searchQuery ? "没有匹配的邮件" : "暂无邮件"}
           </div>
         )}
       </div>
