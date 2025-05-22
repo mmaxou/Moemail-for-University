@@ -20,11 +20,15 @@
 ### 修改&新增功能
 #### 管理员端
 - **用户查询**：现在可以通过搜索查看用户名及等级
+  ![image](https://github.com/user-attachments/assets/f9a8e735-ed76-4a6b-9580-24b3eb4fd135)
 - **用户数量统计**：查看当前邮箱注册/各等级人数，支持一键删除最低等级（未授权）的账户
+  ![image](https://github.com/user-attachments/assets/570e49d5-dc79-4947-b21e-2b764b415d4c)
 - **禁用邮箱删除功能**：用户无法自主删除已经注册的邮箱
 - **默认邮箱时限**：目前只能创建永久时限的邮箱，可以替换[beilunyang/moemail](https://github.com/beilunyang/moemail)中的app/types/email.ts文件恢复
 #### 用户端
 - **邮件查询**：可以在邮件列表中输入关键词（发件人、邮件内容、邮件主题）自动检索对应的邮件
+  ![image](https://github.com/user-attachments/assets/7ead0f40-9aaa-456b-943e-bf9fbd637c05)
+
 
 ### 未来计划
 - [ ] 接入SMTP Server新增发件功能
