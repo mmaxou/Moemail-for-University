@@ -47,7 +47,7 @@ export function MessageList({ email, onMessageSelect, selectedMessageId }: Messa
   const [refreshing, setRefreshing] = useState(false)
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loadingMore, setLoadingMore] = useState(false)
-  const pollTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const pollTimeoutRef = useRef<ReturnType<typeof setInterval>>();
   const messagesRef = useRef<Message[]>([]) // 添加 ref 来追踪最新的消息列表
   const [total, setTotal] = useState(0)
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null)
