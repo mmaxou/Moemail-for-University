@@ -32,15 +32,23 @@ interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
 
 export function Badge({
   variant = "default",
-  className,
+  className = "",
   children,
   ...props
 }: BadgeProps) {
+  // 显式验证输入值
+  const validVariant = (variant as string) in badgeVariants.variants.variant 
+    ? variant 
+    : "default";
+  
+  // 使用有效值生成类名
+  const validClassName = cn(badgeVariants({ variant: validVariant }), className || "");
+  
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props}>
+    <div className={validClassName} {...props}>
       {children}
     </div>
-  )
+  );
 }
 
 export { badgeVariants } 
