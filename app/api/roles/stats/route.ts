@@ -1,6 +1,6 @@
 import { createDb } from "@/lib/db";
-import { roles, userRoles } from "@/lib/schema";
-import { eq, asc } from "drizzle-orm";
+import { roles } from "@/lib/schema";
+import { asc } from "drizzle-orm";
 import { ROLES } from "@/lib/permissions";
 
 export const runtime = "edge";
