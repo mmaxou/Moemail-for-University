@@ -56,7 +56,7 @@ export function useConfig() {
     if (!store.config && !store.loading) {
       store.fetch()
     }
-  }, [store.config, store.loading])
+  }, [store])
 
   return store
 } 
