@@ -66,11 +66,13 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
         url.searchParams.set('cursor', cursor)
       }
       const response = await fetch(url)
-      const data = await response.json()
+      const rawData = await response.json()
       
       if (!response.ok) {
-        throw new Error(data.error || "加载邮箱失败")
+        throw new Error((rawData as { error?: string }).error || "加载邮箱失败")
       }
+      
+      const data = rawData as EmailResponse
       
       if (!cursor) {
         setEmails(data.emails)
