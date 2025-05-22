@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { CreateDialog } from "./create-dialog"
 import { Mail, RefreshCw, Trash2 } from "lucide-react"
@@ -43,8 +43,8 @@ interface EmailResponse {
 
 export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const { data: session } = useSession()
-  const { config } = useConfig()
   const { role } = useUserRole()
+  const { config } = useConfig()
   const [emails, setEmails] = useState<Email[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -54,8 +54,11 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [emailToDelete, setEmailToDelete] = useState<Email | null>(null)
   const { toast } = useToast()
 
-  const fetchEmails = async (cursor?: string) => {
+  const fetchEmails = useCallback(async (cursor?: string) => {
     try {
+      if (!cursor) setLoading(true)
+      else setLoadingMore(true)
+      
       const url = new URL("/api/emails", window.location.origin)
       if (cursor) {
         url.searchParams.set('cursor', cursor)
@@ -92,7 +95,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
       setRefreshing(false)
       setLoadingMore(false)
     }
-  }
+  }, [emails]);
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -114,7 +117,7 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
 
   useEffect(() => {
     if (session) fetchEmails()
-  }, [session])
+  }, [session, fetchEmails])
 
   const handleDelete = async (email: Email) => {
     try {
