@@ -1,9 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Gem, Sword, User2, Loader2, AlertCircle } from "lucide-react"
+import { Gem, Sword, User2, Loader2, AlertCircle, Users, Trash } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { ROLES, Role } from "@/lib/permissions"
 import {
@@ -13,6 +13,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 
 const roleIcons = {
   [ROLES.DUKE]: Gem,
@@ -29,6 +42,13 @@ const roleNames = {
 
 type RoleWithoutEmperor = Exclude<Role, typeof ROLES.EMPEROR>
 
+interface RoleStats {
+  [ROLES.EMPEROR]: number;
+  [ROLES.DUKE]: number;
+  [ROLES.KNIGHT]: number;
+  [ROLES.CIVILIAN]: number;
+}
+
 export function PromotePanel() {
   const [searchText, setSearchText] = useState("")
   const [loading, setLoading] = useState(false)
@@ -42,6 +62,9 @@ export function PromotePanel() {
     role?: string;
   } | null>(null)
   const [searchError, setSearchError] = useState<string | null>(null)
+  const [roleStats, setRoleStats] = useState<RoleStats | null>(null)
+  const [loadingStats, setLoadingStats] = useState(false)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // 定义API响应类型
   type SearchResponse = {
@@ -54,6 +77,30 @@ export function PromotePanel() {
       role?: string;
     };
   };
+
+  // 获取角色统计数据
+  const fetchRoleStats = async () => {
+    try {
+      setLoadingStats(true)
+      const response = await fetch("/api/roles/stats")
+      
+      if (!response.ok) {
+        throw new Error("获取统计数据失败")
+      }
+      
+      const data = await response.json()
+      setRoleStats(data)
+    } catch (error) {
+      console.error("获取角色统计失败:", error)
+    } finally {
+      setLoadingStats(false)
+    }
+  }
+
+  // 初始化时获取角色统计
+  useEffect(() => {
+    fetchRoleStats()
+  }, [])
 
   // 简单搜索用户，不使用debounce
   const handleSearch = async () => {
@@ -122,11 +169,14 @@ export function PromotePanel() {
         description: `已将用户 ${foundUser.username || foundUser.email} 设为${roleNames[targetRole as keyof typeof roleNames]}`,
       })
       
-      // 刷新用户信息
+      // 刷新用户信息和角色统计
       setFoundUser({
         ...foundUser,
         role: targetRole
       })
+      
+      // 更新角色统计
+      fetchRoleStats()
     } catch (error) {
       toast({
         title: "设置失败",
@@ -135,6 +185,38 @@ export function PromotePanel() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+
+  // 删除未认证用户
+  const handleDeleteUncertified = async () => {
+    setDeleteLoading(true)
+    try {
+      const res = await fetch("/api/roles/delete-uncertified", {
+        method: "DELETE"
+      })
+      
+      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(data.error || "删除失败")
+      }
+      
+      toast({
+        title: "删除成功",
+        description: data.message || `已删除 ${data.deleted} 个未认证用户`,
+      })
+      
+      // 更新角色统计
+      fetchRoleStats()
+    } catch (error) {
+      toast({
+        title: "删除失败",
+        description: error instanceof Error ? error.message : "请稍后重试",
+        variant: "destructive"
+      })
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
@@ -177,6 +259,102 @@ export function PromotePanel() {
         <Icon className="w-5 h-5 text-primary" />
         <h2 className="text-lg font-semibold">角色管理</h2>
       </div>
+
+      {/* 角色统计卡片 */}
+      <Card className="p-4 mb-6 bg-primary/5">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            <h3 className="font-medium">用户角色统计</h3>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={fetchRoleStats}
+            disabled={loadingStats}
+          >
+            <Loader2 className={`w-4 h-4 ${loadingStats ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          {roleStats ? (
+            <>
+              <div className="flex items-center justify-between">
+                <span className="text-sm flex items-center gap-1">
+                  <Gem className="w-3 h-3" /> 教授
+                </span>
+                <Badge variant="secondary">{roleStats[ROLES.DUKE]}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm flex items-center gap-1">
+                  <Sword className="w-3 h-3" /> 认证学生
+                </span>
+                <Badge variant="secondary">{roleStats[ROLES.KNIGHT]}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm flex items-center gap-1">
+                  <User2 className="w-3 h-3" /> 未认证
+                </span>
+                <Badge variant="secondary">{roleStats[ROLES.CIVILIAN]}</Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm flex items-center gap-1">
+                  总计
+                </span>
+                <Badge>
+                  {roleStats[ROLES.EMPEROR] + 
+                   roleStats[ROLES.DUKE] + 
+                   roleStats[ROLES.KNIGHT] + 
+                   roleStats[ROLES.CIVILIAN]}
+                </Badge>
+              </div>
+            </>
+          ) : (
+            <div className="col-span-2 text-center py-2 text-sm text-muted-foreground">
+              {loadingStats ? "加载中..." : "无数据"}
+            </div>
+          )}
+        </div>
+        
+        {/* 删除未认证用户按钮 */}
+        <div className="mt-4 pt-2 border-t border-primary/10">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                size="sm"
+                className="w-full"
+                disabled={deleteLoading || (roleStats && roleStats[ROLES.CIVILIAN] === 0)}
+              >
+                {deleteLoading ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Trash className="w-4 h-4 mr-2" />
+                )}
+                删除所有未认证用户
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确认删除</AlertDialogTitle>
+                <AlertDialogDescription>
+                  此操作将删除所有未认证用户的账号信息，删除后无法恢复。确定要继续吗？
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogAction 
+                  className="bg-destructive hover:bg-destructive/90"
+                  onClick={handleDeleteUncertified}
+                >
+                  删除
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </Card>
 
       <div className="space-y-4">
         {/* 用户信息显示区域 */}
