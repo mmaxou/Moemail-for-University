@@ -199,12 +199,12 @@ export function PromotePanel() {
       const data = await res.json()
       
       if (!res.ok) {
-        throw new Error(data.error || "删除失败")
+        throw new Error((data as {error?: string}).error || "删除失败")
       }
       
       toast({
         title: "删除成功",
-        description: data.message || `已删除 ${data.deleted} 个未认证用户`,
+        description: (data as {message?: string, deleted?: number}).message || `已删除 ${(data as {deleted?: number}).deleted} 个未认证用户`,
       })
       
       // 更新角色统计
