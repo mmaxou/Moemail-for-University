@@ -325,7 +325,7 @@ export function PromotePanel() {
                 variant="destructive" 
                 size="sm"
                 className="w-full"
-                disabled={deleteLoading || (roleStats && roleStats[ROLES.CIVILIAN] === 0)}
+                disabled={deleteLoading || (roleStats ? roleStats[ROLES.CIVILIAN] === 0 : false)}
               >
                 {deleteLoading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
