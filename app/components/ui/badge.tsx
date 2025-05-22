@@ -36,16 +36,10 @@ export function Badge({
   children,
   ...props
 }: BadgeProps) {
-  // 显式验证输入值
-  const validVariant = (variant as string) in badgeVariants.variants.variant 
-    ? variant 
-    : "default";
-  
-  // 使用有效值生成类名
-  const validClassName = cn(badgeVariants({ variant: validVariant }), className || "");
-  
+  // 直接使用variant，不再做额外的验证
+  // class-variance-authority会处理默认值
   return (
-    <div className={validClassName} {...props}>
+    <div className={cn(badgeVariants({ variant }), className)} {...props}>
       {children}
     </div>
   );
