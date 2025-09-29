@@ -144,6 +144,20 @@ export const announcements = sqliteTable('announcement', {
     .$defaultFn(() => new Date()),
 });
 
+// 每日邮件统计表
+export const dailyEmailStats = sqliteTable('daily_email_stats', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  date: text('date').notNull().unique(), // YYYY-MM-DD 格式
+  sentCount: integer('sent_count').notNull().default(0), // 当日已发送邮件数量
+  maxCount: integer('max_count').notNull().default(100), // 每日最大发送数量限制
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const rolesRelations = relations(roles, ({ many }) => ({
   userRoles: many(userRoles),
 }));

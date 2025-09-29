@@ -102,6 +102,19 @@ export async function POST(
       )
     }
 
+    // 检查每日发送限额并更新统计
+    const statsResponse = await fetch(new URL('/api/daily-email-stats', req.url), {
+      method: 'POST'
+    })
+    
+    if (!statsResponse.ok) {
+      const statsError = await statsResponse.json()
+      return NextResponse.json(
+        { error: statsError.error || "邮件发送失败" },
+        { status: statsResponse.status }
+      )
+    }
+
     let result
     
     // 优先使用 Resend（支持 Edge Runtime）
