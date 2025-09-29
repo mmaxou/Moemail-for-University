@@ -48,9 +48,11 @@ async function migrate() {
 
     const dbName = config.d1_databases[0].database_name
 
-    // Generate migrations
-    console.log('Generating migrations...')
-    await execAsync('drizzle-kit generate')
+    // Only generate migrations in development mode
+    if (mode === 'local') {
+      console.log('Generating migrations...')
+      await execAsync('drizzle-kit generate')
+    }
     
     // Applying migrations
     console.log(`Applying migrations to ${mode} database: ${dbName}`)
