@@ -71,7 +71,7 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
             </div>
           ) : (
             <div className="space-y-4">
-              {announcements.map((announcement, index) => (
+              {announcements.map((announcement: any, index: any) => (
                 <div
                   key={announcement.id}
                   className={`p-4 rounded-lg border ${

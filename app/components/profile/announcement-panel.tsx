@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -40,7 +40,7 @@ export function AnnouncementPanel() {
   const [submitting, setSubmitting] = useState(false)
   const { toast } = useToast()
 
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     try {
       const response = await fetch("/api/announcements")
       if (response.ok) {
@@ -50,6 +50,7 @@ export function AnnouncementPanel() {
         throw new Error("获取公告失败")
       }
     } catch (error) {
+      console.error("Failed to fetch announcements:", error)
       toast({
         title: "错误",
         description: "获取公告失败",
@@ -58,11 +59,11 @@ export function AnnouncementPanel() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     fetchAnnouncements()
-  }, [])
+  }, [fetchAnnouncements])
 
   const handleCreate = async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
@@ -96,6 +97,7 @@ export function AnnouncementPanel() {
         throw new Error("创建失败")
       }
     } catch (error) {
+      console.error("Failed to create announcement:", error)
       toast({
         title: "错误",
         description: "创建公告失败",
@@ -150,6 +152,7 @@ export function AnnouncementPanel() {
         throw new Error("更新失败")
       }
     } catch (error) {
+      console.error("Failed to update announcement:", error)
       toast({
         title: "错误",
         description: "更新公告失败",
@@ -180,6 +183,7 @@ export function AnnouncementPanel() {
         throw new Error("删除失败")
       }
     } catch (error) {
+      console.error("Failed to delete announcement:", error)
       toast({
         title: "错误",
         description: "删除公告失败",
@@ -231,7 +235,7 @@ export function AnnouncementPanel() {
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="输入公告标题"
                 />
               </div>
@@ -240,7 +244,7 @@ export function AnnouncementPanel() {
                 <Textarea
                   id="content"
                   value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  onChange={(e: any) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="输入公告内容"
                   rows={6}
                 />
@@ -249,7 +253,7 @@ export function AnnouncementPanel() {
                 <Switch
                   id="enabled"
                   checked={formData.enabled}
-                  onCheckedChange={(enabled) => setFormData({ ...formData, enabled })}
+                  onCheckedChange={(enabled: any) => setFormData({ ...formData, enabled })}
                 />
                 <Label htmlFor="enabled">启用公告</Label>
               </div>
@@ -280,7 +284,7 @@ export function AnnouncementPanel() {
         {announcements.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">暂无公告</p>
         ) : (
-          announcements.map((announcement) => (
+          announcements.map((announcement: any) => (
             <div
               key={announcement.id}
               className="border rounded-lg p-4 bg-card"
@@ -335,7 +339,7 @@ export function AnnouncementPanel() {
               <Input
                 id="edit-title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="输入公告标题"
               />
             </div>
@@ -344,7 +348,7 @@ export function AnnouncementPanel() {
               <Textarea
                 id="edit-content"
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(e: any) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="输入公告内容"
                 rows={6}
               />
@@ -353,7 +357,7 @@ export function AnnouncementPanel() {
               <Switch
                 id="edit-enabled"
                 checked={formData.enabled}
-                onCheckedChange={(enabled) => setFormData({ ...formData, enabled })}
+                onCheckedChange={(enabled: any) => setFormData({ ...formData, enabled })}
               />
               <Label htmlFor="edit-enabled">启用公告</Label>
             </div>
