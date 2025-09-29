@@ -1,0 +1,310 @@
+[33mcommit 138b9ee102bb760f2822c5ba627800cae9fb3432[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Sep 29 11:36:04 2025 +0800
+
+    回档
+
+[33mcommit 48513d2366cda992948d84cc45669bd498e39cf1[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 17:39:30 2025 +0800
+
+    修复bug
+
+[33mcommit 2b17921eb63b9973bb1fee35994fc6c13ef8ee38[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 17:23:14 2025 +0800
+
+    修复Bug
+
+[33mcommit daac99616b811bfa3516a4d7bde4d898f901e1b3[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 17:15:41 2025 +0800
+
+    修复bug
+
+[33mcommit 3013ecf02fbe64e85db15f0be85ec8a40075a461[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 16:59:12 2025 +0800
+
+    修复删除错误的bug
+
+[33mcommit d877e362466fee4a179e88efb18d5bbade77e849[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 11:52:00 2025 +0800
+
+    修复
+
+[33mcommit ff442372589ae6435e412901ae01446b454a1238[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 10:40:53 2025 +0800
+
+    xiu du
+
+[33mcommit 69e7b189ff02b261a0afe3554dddebcca8949667[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 10:30:18 2025 +0800
+
+    修复bug
+
+[33mcommit 43f8d395b3d0ea3df662c70599e18a9c710ec290[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 10:26:24 2025 +0800
+
+    修复编译错误
+
+[33mcommit 1b30cbf89fb581d5cd2a40ca7b3e1d635d5d6da4[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 08:56:17 2025 +0800
+
+    修复sql的bug
+
+[33mcommit d5d7b98b0002b08713595829403800b43e56349c[m
+Author: mmaxou <21238185@qq.com>
+Date:   Sun Sep 28 08:46:39 2025 +0800
+
+    修复部分bug
+
+[33mcommit baf140d216a27e362b6133dc2e036ade26bbbf5f[m
+Author: mmaxou <21238185@qq.com>
+Date:   Tue Aug 12 22:30:26 2025 +0800
+
+    修复bug
+
+[33mcommit 84cc8d73bdc9d763dd19cb83645eaa5acaaaf518[m
+Author: mmaxou <21238185@qq.com>
+Date:   Tue Aug 12 22:05:21 2025 +0800
+
+    修复其他用户无法发件的错误
+
+[33mcommit 8d7226aacd6fc74674415e8ded51a09bd989bfc7[m[33m ([m[1;33mtag: [m[1;33m0714[m[33m)[m
+Merge: f259479 5803932
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 12:06:19 2025 +0800
+
+    Merge branch 'main' of https://github.com/mmaxou/Moemail-for-University
+
+[33mcommit f25947944ec8839a9d2dd5007d48a3f95430eac7[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 12:06:16 2025 +0800
+
+    fix0714
+
+[33mcommit 5803932f14cc43979e99ee9d92dac612c90cf8b2[m
+Author: William Mack <134894754+mmaxou@users.noreply.github.com>
+Date:   Mon Jul 14 11:54:45 2025 +0800
+
+    0714-new
+
+[33mcommit 8c973d671f73ed11175ce57e69a7112f4634209f[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 11:45:37 2025 +0800
+
+    fix0714
+
+[33mcommit 508b1548c93f5c521b0aff75e31e29d12546b174[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 11:41:00 2025 +0800
+
+    fix0714
+
+[33mcommit d8220be3f9881cd08add9fb847c786bf3647495c[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 11:34:05 2025 +0800
+
+    fix
+
+[33mcommit bde82733aefe7458c65fff4f9d95122d9135505d[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 11:26:07 2025 +0800
+
+    修复0714
+
+[33mcommit c3960631bb38e50a3b3bbdb09d137b593a37d5e9[m
+Author: mmaxou <21238185@qq.com>
+Date:   Mon Jul 14 10:45:12 2025 +0800
+
+    管理员可以修改单个成员的可创建邮箱数量
+
+[33mcommit 1152740cfc6bdb4d76495467310a7cdf31e53a68[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 09:41:51 2025 +0800
+
+    页面样式修改
+
+[33mcommit 267402ae56d16b5251855dbf391b4553a369f967[m[33m ([m[1;33mtag: [m[1;33m0627[m[33m)[m
+Author: William Mack <134894754+mmaxou@users.noreply.github.com>
+Date:   Fri Jun 27 09:21:03 2025 +0800
+
+    Update README.md
+
+[33mcommit e7ac1fb8f1606c3873baf01b112507878a702c1f[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 09:20:33 2025 +0800
+
+    fix
+
+[33mcommit a27973365a06b8096b2c78520b977c9eadb3cc5b[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 08:49:01 2025 +0800
+
+    邮件回复
+
+[33mcommit f47fb9982737e948ea47f697573afc981b9cd3cf[m
+Author: William Mack <134894754+mmaxou@users.noreply.github.com>
+Date:   Fri Jun 27 02:31:32 2025 +0800
+
+    0627
+
+[33mcommit f356a24d0c7db47fed668ec93a9aedb3c81c014d[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 02:23:55 2025 +0800
+
+    fix
+
+[33mcommit 982a39c44d14e95db4020080193c86a5edca06ab[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 02:11:20 2025 +0800
+
+    fix
+
+[33mcommit 36ef8b90894e213c1d155de241a3975565977cfa[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 02:05:01 2025 +0800
+
+    发件
+
+[33mcommit 9c21499f771dfc42776f793a072e718db35dd60f[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 01:35:13 2025 +0800
+
+    fix
+
+[33mcommit 4fabee17c9ceaa1040a24c254e6ae3893fd91238[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 01:24:46 2025 +0800
+
+    fix
+
+[33mcommit a7b1b7d746c8d1e29449d6735316660cbe354e68[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 01:11:01 2025 +0800
+
+    发件记录修复V2
+
+[33mcommit dc50d3c12a4894583de08bf348695952f6c6e584[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 00:58:23 2025 +0800
+
+    错误调试
+
+[33mcommit 735e0a9452976a27c21f5c58bbffd9d0f0d38e55[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 00:46:16 2025 +0800
+
+    fix bugs
+
+[33mcommit 793fe639ad1b9ef8be7529f63cfde0f14be2e102[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 00:36:40 2025 +0800
+
+    新增发件记录V1
+
+[33mcommit 52ae44921eb6f2076791587652371b922124da84[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 00:20:34 2025 +0800
+
+    fix bugs
+
+[33mcommit 2e8807d82a2691a0c653b7d663d8fccf669b2aec[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri Jun 27 00:13:08 2025 +0800
+
+    fix bugs
+
+[33mcommit 167b8f13501670845ef170cd74dd9adc02a90666[m
+Merge: d5c7e3c 79a413b
+Author: mmaxou <21238185@qq.com>
+Date:   Thu Jun 26 23:59:27 2025 +0800
+
+    Merge branch 'main' of https://github.com/mmaxou/Moemail-for-University
+
+[33mcommit d5c7e3c328d178a6395285f54dfeb502a2b0aed7[m
+Author: mmaxou <21238185@qq.com>
+Date:   Thu Jun 26 23:59:01 2025 +0800
+
+    增加一键删除所有邮件
+
+[33mcommit 79a413b8bbb33351e238c3c33a82225911c80002[m[33m ([m[1;33mtag: [m[1;33m0523[m[33m)[m
+Author: William Mack <134894754+mmaxou@users.noreply.github.com>
+Date:   Fri May 23 17:20:18 2025 +0800
+
+    0523版本
+
+[33mcommit 747c31c7c93711f79fa27d6d3f19e3823fbfc84e[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:59:02 2025 +0800
+
+    0522版本
+
+[33mcommit 9484eb7fbbeeaf53f91e8e93343556483e866f37[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:55:37 2025 +0800
+
+    0522版本
+
+[33mcommit b25221653759003643e30e1cde06ed0309d0ad62[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:52:12 2025 +0800
+
+    0522版本
+
+[33mcommit abaab72281d1827b23318ad616ab620c2db59e2e[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:49:01 2025 +0800
+
+    0522版本
+
+[33mcommit 8ca2b064df59f56a28f852f1eb080ca4c2440bca[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:44:13 2025 +0800
+
+    0522版本
+
+[33mcommit ce4a5a8a065c61f07e736c6d2361b9e099000910[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:40:13 2025 +0800
+
+    0522版本
+
+[33mcommit 70aa4f5d445759bcba61ab97966b21dd5b336ab7[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:36:38 2025 +0800
+
+    0522版本
+
+[33mcommit 65e4a32f0ddc8a76297c79c7b42c100cc031a7ff[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:25:43 2025 +0800
+
+    0522版本
+
+[33mcommit 9b055f242ec0c360c034e6db28d1d059d3b33cef[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 16:23:17 2025 +0800
+
+    0522版本
+
+[33mcommit 53f0959a38dc4d2a46693b510fe8e67dd0b9fb8f[m
+Author: mmaxou <21238185@qq.com>
+Date:   Fri May 23 15:09:05 2025 +0800
+
+    0523
+
+[33mcommit 10eb8d4f54f58379ad423ac235b0d22fee5bb567[m
+Author: William Mack <134894754+mmaxou@users.noreply.github.com>
+Date:   Fri May 23 14:58:52 2025 +0800
+
+    Delete wrangler.example.json
+
+[33mcommit 678713ae603bfc0cc55d8fbcffd6ed7283c8088b[m
+Author: William Mack <134894754+mmaxou@users.noreply.g
