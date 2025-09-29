@@ -36,7 +36,7 @@ export function AnnouncementProvider({ children }: AnnouncementProviderProps) {
     try {
       const response = await fetch("/api/announcements")
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as Announcement[]
         setAnnouncements(data)
         return data
       }

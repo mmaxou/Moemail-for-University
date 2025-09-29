@@ -8,16 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-
-
-type Announcement = {
-  id: string
-  title: string
-  content: string
-  enabled: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { Announcement } from "@/types/announcement"
 
 interface AnnouncementDialogProps {
   open: boolean
@@ -36,7 +27,7 @@ export function AnnouncementDialog({ open, onOpenChange }: AnnouncementDialogPro
         setLoading(true)
         const response = await fetch("/api/announcements")
         if (response.ok) {
-          const data = await response.json()
+          const data = await response.json() as Announcement[]
           setAnnouncements(data)
         }
       } catch (error) {

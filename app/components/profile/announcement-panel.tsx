@@ -16,15 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-
-type Announcement = {
-  id: string
-  title: string
-  content: string
-  enabled: boolean
-  createdAt: string
-  updatedAt: string
-}
+import { Announcement } from "@/types/announcement"
 
 export function AnnouncementPanel() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
@@ -44,7 +36,7 @@ export function AnnouncementPanel() {
     try {
       const response = await fetch("/api/announcements")
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json() as Announcement[]
         setAnnouncements(data)
       } else {
         throw new Error("获取公告失败")
