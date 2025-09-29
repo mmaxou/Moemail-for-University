@@ -106,6 +106,13 @@
       "when": 1741491200000,
       "tag": "0014_update_default_max_emails",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "6",
+      "when": 1741491300000,
+      "tag": "0015_add_announcements_table",
+      "breakpoints": true
     }
   ]
 }

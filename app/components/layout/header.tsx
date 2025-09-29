@@ -1,6 +1,7 @@
 import { SignButton } from "@/components/auth/sign-button"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
 import { Logo } from "@/components/ui/logo"
+import { AnnouncementButton } from "@/components/layout/announcement-button"
 
 export function Header() {
   return (
@@ -9,6 +10,7 @@ export function Header() {
         <div className="h-full flex items-center justify-between">
           <Logo />
           <div className="flex items-center gap-4">
+            <AnnouncementButton />
             <ThemeToggle />
             <SignButton />
           </div>

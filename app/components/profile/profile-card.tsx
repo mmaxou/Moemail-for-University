@@ -12,6 +12,7 @@ import { useRolePermission } from "@/hooks/use-role-permission"
 import { PERMISSIONS } from "@/lib/permissions"
 import { ConfigPanel } from "./config-panel"
 import { ApiKeyPanel } from "./api-key-panel"
+import { AnnouncementPanel } from "./announcement-panel"
 
 interface ProfileCardProps {
   user: User
@@ -30,6 +31,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
   const canManageWebhook = checkPermission(PERMISSIONS.MANAGE_WEBHOOK)
   const canPromote = checkPermission(PERMISSIONS.PROMOTE_USER)
   const canManageConfig = checkPermission(PERMISSIONS.MANAGE_CONFIG)
+  const canManageAnnouncement = checkPermission(PERMISSIONS.MANAGE_ANNOUNCEMENT)
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -99,6 +101,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
       {canManageConfig && <ConfigPanel />}
       {canPromote && <PromotePanel />}
       {canManageWebhook && <ApiKeyPanel />}
+      {canManageAnnouncement && <AnnouncementPanel />}
 
       <div className="flex flex-col sm:flex-row gap-4 px-1">
         <Button 
