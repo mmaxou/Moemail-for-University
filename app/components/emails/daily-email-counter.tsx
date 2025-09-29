@@ -1,113 +1,103 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Mail, AlertCircle } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Mail } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { useToast } from "@/components/ui/use-toast"
 
 interface DailyEmailCounterProps {
-  className?: string
   onStatsChange?: (stats: { sentCount: number; maxCount: number }) => void
 }
 
-interface EmailStats {
+interface DailyStats {
+  date: string
   sentCount: number
   maxCount: number
-  date: string
 }
 
-export function DailyEmailCounter({ className, onStatsChange }: DailyEmailCounterProps) {
-  const [stats, setStats] = useState<EmailStats | null>(null)
+export function DailyEmailCounter({ onStatsChange }: DailyEmailCounterProps) {
+  const [stats, setStats] = useState<DailyStats | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
 
   const fetchStats = async () => {
     try {
-      setError(null)
-      const response = await fetch("/api/daily-email-stats")
-      if (!response.ok) {
-        throw new Error("获取邮件统计失败")
+      const response = await fetch("/api/daily-stats")
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+        onStatsChange?.(data)
+      } else {
+        throw new Error("Failed to fetch stats")
       }
-      const data = await response.json()
-      setStats(data)
-      onStatsChange?.(data)
-    } catch (err) {
-      console.error("Failed to fetch email stats:", err)
-      setError(err instanceof Error ? err.message : "未知错误")
+    } catch (error) {
+      console.error("Error fetching daily stats:", error)
+      toast({
+        title: "获取统计信息失败",
+        description: "无法获取今日邮件发送统计",
+        variant: "destructive"
+      })
     } finally {
       setLoading(false)
     }
-  }
-
-  // 刷新统计数据的方法，可以被父组件调用
-  const refreshStats = () => {
-    fetchStats()
   }
 
   useEffect(() => {
     fetchStats()
   }, [])
 
-  // 计算进度百分比
-  const progressPercentage = stats ? (stats.sentCount / stats.maxCount) * 100 : 0
-  
-  // 判断是否接近或达到限额
-  const isWarning = progressPercentage >= 80
-  const isCritical = progressPercentage >= 100
+  // 提供给外部组件刷新统计的方法
+  useEffect(() => {
+    const refreshStats = () => {
+      fetchStats()
+    }
+    
+    // 监听自定义事件来刷新统计
+    window.addEventListener('refreshDailyStats', refreshStats)
+    
+    return () => {
+      window.removeEventListener('refreshDailyStats', refreshStats)
+    }
+  }, [])
 
   if (loading) {
     return (
-      <div className={cn("flex items-center gap-2 text-sm text-gray-500", className)}>
+      <div className="flex items-center gap-2 text-sm text-gray-500">
         <Mail className="w-4 h-4" />
         <span>加载中...</span>
       </div>
     )
   }
 
-  if (error) {
+  if (!stats) {
     return (
-      <div className={cn("flex items-center gap-2 text-sm text-red-500", className)}>
-        <AlertCircle className="w-4 h-4" />
-        <span>统计加载失败</span>
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <Mail className="w-4 h-4" />
+        <span>统计不可用</span>
       </div>
     )
   }
 
-  if (!stats) {
-    return null
-  }
+  const percentage = (stats.sentCount / stats.maxCount) * 100
+  const isNearLimit = percentage >= 80
+  const isAtLimit = percentage >= 100
 
   return (
-    <div className={cn("flex items-center gap-2 text-sm", className)}>
-      <Mail className={cn(
-        "w-4 h-4",
-        isCritical ? "text-red-500" : isWarning ? "text-orange-500" : "text-blue-500"
-      )} />
-      <div className="flex items-center gap-2">
-        <span className={cn(
-          "font-medium",
-          isCritical ? "text-red-600" : isWarning ? "text-orange-600" : "text-gray-700"
-        )}>
-          今日邮件: {stats.sentCount}/{stats.maxCount}
-        </span>
-        
-        {/* 进度条 */}
-        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div 
-            className={cn(
-              "h-full transition-all duration-300 rounded-full",
-              isCritical ? "bg-red-500" : isWarning ? "bg-orange-500" : "bg-blue-500"
-            )}
-            style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-          />
-        </div>
-        
-        {isCritical && (
-          <span className="text-xs text-red-500 font-medium">已达上限</span>
-        )}
-      </div>
+    <div className="flex items-center gap-2 text-sm">
+      <Mail className="w-4 h-4" />
+      <span className="text-gray-600">今日发送:</span>
+      <Badge 
+        variant={isAtLimit ? "destructive" : isNearLimit ? "secondary" : "outline"}
+        className="font-mono"
+      >
+        {stats.sentCount}/{stats.maxCount}
+      </Badge>
+      {isAtLimit && (
+        <span className="text-xs text-red-500">已达上限</span>
+      )}
+      {isNearLimit && !isAtLimit && (
+        <span className="text-xs text-orange-500">接近上限</span>
+      )}
     </div>
   )
 }
-
-// 导出刷新方法，供外部组件使用
-export { type EmailStats }

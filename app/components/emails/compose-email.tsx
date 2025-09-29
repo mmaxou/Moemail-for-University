@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import { Send, Paperclip, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,6 @@ export function ComposeEmail({ emailId, emailAddress, onClose, onSentEmail, repl
   const [content, setContent] = useState(replyContent || "")
   const [attachments, setAttachments] = useState<Attachment[]>([])
   const [sending, setSending] = useState(false)
-  const [counterKey, setCounterKey] = useState(0) // 用于强制刷新统计组件
   const { toast } = useToast()
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,8 +118,8 @@ export function ComposeEmail({ emailId, emailAddress, onClose, onSentEmail, repl
         description: "邮件已发送"
       })
 
-      // 刷新邮件统计显示
-      setCounterKey(prev => prev + 1)
+      // 刷新每日统计显示
+      window.dispatchEvent(new CustomEvent('refreshDailyStats'))
 
       // 通知父组件发件成功
       if (onSentEmail) {
@@ -158,7 +157,7 @@ export function ComposeEmail({ emailId, emailAddress, onClose, onSentEmail, repl
       <div className="p-4 space-y-4 border-b border-primary/20">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-bold">{replyTo ? "回复邮件" : "撰写新邮件"}</h3>
-          <DailyEmailCounter key={counterKey} />
+          <DailyEmailCounter />
         </div>
         <div className="text-xs text-gray-500">
           发件人：{emailAddress}

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { createDb } from "@/lib/db"
-import { messages, emails } from "@/lib/schema"
+import { messages, emails, dailyEmailStats } from "@/lib/schema"
 import { eq, and } from "drizzle-orm"
 
 export const runtime = 'edge'
@@ -102,19 +102,6 @@ export async function POST(
       )
     }
 
-    // 检查每日发送限额并更新统计
-    const statsResponse = await fetch(new URL('/api/daily-email-stats', req.url), {
-      method: 'POST'
-    })
-    
-    if (!statsResponse.ok) {
-      const statsError = await statsResponse.json()
-      return NextResponse.json(
-        { error: statsError.error || "邮件发送失败" },
-        { status: statsResponse.status }
-      )
-    }
-
     let result
     
     // 优先使用 Resend（支持 Edge Runtime）
@@ -133,6 +120,30 @@ export async function POST(
       )
     }
 
+    // 检查每日发送限制
+    const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD 格式
+    let todayStats = await db.query.dailyEmailStats.findFirst({
+      where: eq(dailyEmailStats.date, today)
+    })
+
+    if (!todayStats) {
+      // 创建今日记录
+      const [newRecord] = await db.insert(dailyEmailStats).values({
+        date: today,
+        sentCount: 0,
+        maxCount: 100,
+      }).returning()
+      todayStats = newRecord
+    }
+
+    // 检查是否已达到每日发送上限
+    if (todayStats.sentCount >= todayStats.maxCount) {
+      return NextResponse.json(
+        { error: `今日邮件发送数量已达上限 (${todayStats.maxCount})` },
+        { status: 429 }
+      )
+    }
+
     // 保存发件记录到数据库
     const sentMessage = await db.insert(messages).values({
       emailId: emailId,
@@ -144,6 +155,15 @@ export async function POST(
       type: "sent",
       receivedAt: new Date()
     }).returning()
+
+    // 更新每日统计
+    await db
+      .update(dailyEmailStats)
+      .set({ 
+        sentCount: todayStats.sentCount + 1,
+        updatedAt: new Date()
+      })
+      .where(eq(dailyEmailStats.date, today))
 
     return NextResponse.json({
       success: true,

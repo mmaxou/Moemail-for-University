@@ -113,6 +113,13 @@
       "when": 1741491300000,
       "tag": "0015_add_announcements_table",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1741491400000,
+      "tag": "0016_add_daily_email_stats",
+      "breakpoints": true
     }
   ]
 }
