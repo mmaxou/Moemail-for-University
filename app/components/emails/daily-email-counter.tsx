@@ -24,9 +24,9 @@ export function DailyEmailCounter({ onStatsChange }: DailyEmailCounterProps) {
     try {
       const response = await fetch("/api/daily-stats")
       if (response.ok) {
-        const data = await response.json()
-        setStats(data)
-        onStatsChange?.(data)
+          const data = await response.json()
+          setStats(data as DailyStats)
+          onStatsChange?.(data as DailyStats)
       } else {
         throw new Error("Failed to fetch stats")
       }
