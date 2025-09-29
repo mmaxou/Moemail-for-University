@@ -46,7 +46,7 @@ export async function POST() {
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD 格式
     
     // 检查今日记录是否存在
-    let todayStats = await db.query.dailyEmailStats.findFirst({
+    const todayStats = await db.query.dailyEmailStats.findFirst({
       where: eq(dailyEmailStats.date, today)
     })
 

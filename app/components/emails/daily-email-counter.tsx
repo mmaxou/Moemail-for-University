@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Mail } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
@@ -20,7 +20,7 @@ export function DailyEmailCounter({ onStatsChange }: DailyEmailCounterProps) {
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const response = await fetch("/api/daily-stats")
       if (response.ok) {
@@ -40,11 +40,11 @@ export function DailyEmailCounter({ onStatsChange }: DailyEmailCounterProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [onStatsChange, toast])
 
   useEffect(() => {
     fetchStats()
-  }, [])
+  }, [fetchStats])
 
   // 提供给外部组件刷新统计的方法
   useEffect(() => {
@@ -58,7 +58,7 @@ export function DailyEmailCounter({ onStatsChange }: DailyEmailCounterProps) {
     return () => {
       window.removeEventListener('refreshDailyStats', refreshStats)
     }
-  }, [])
+  }, [fetchStats])
 
   if (loading) {
     return (
