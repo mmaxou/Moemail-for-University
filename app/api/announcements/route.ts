@@ -4,6 +4,7 @@ import { announcements } from "@/lib/schema"
 import { checkPermission } from "@/lib/auth"
 import { PERMISSIONS } from "@/lib/permissions"
 import { desc, eq } from "drizzle-orm"
+import { CreateAnnouncementRequest } from "@/types/announcement"
 
 export const runtime = "edge"
 
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { title, content, enabled = true } = await request.json()
+    const { title, content, enabled = true } = await request.json() as CreateAnnouncementRequest
 
     if (!title || !content) {
       return NextResponse.json(
