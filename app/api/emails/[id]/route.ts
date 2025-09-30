@@ -10,38 +10,11 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const userId = await getUserId()
-
-  try {
-    const db = createDb()
-    const { id } = await params
-    const email = await db.query.emails.findFirst({
-      where: and(
-        eq(emails.id, id),
-        eq(emails.userId, userId!)
-      )
-    })
-
-    if (!email) {
-      return NextResponse.json(
-        { error: "邮箱不存在或无权限删除" },
-        { status: 403 }
-      )
-    }
-    await db.delete(messages)
-      .where(eq(messages.emailId, id))
-
-    await db.delete(emails)
-      .where(eq(emails.id, id))
-
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('Failed to delete email:', error)
-    return NextResponse.json(
-      { error: "删除邮箱失败" },
-      { status: 500 }
-    )
-  }
+  // 邮箱删除功能已被禁用
+  return NextResponse.json(
+    { error: "邮箱删除功能已被管理员禁用" },
+    { status: 403 }
+  )
 }
 
 export async function PATCH(

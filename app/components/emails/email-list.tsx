@@ -3,21 +3,11 @@
 import { useEffect, useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import { CreateDialog } from "./create-dialog"
-import { Mail, RefreshCw, Trash2 } from "lucide-react"
+import { Mail, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useThrottle } from "@/hooks/use-throttle"
 import { useToast } from "@/components/ui/use-toast"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { ROLES } from "@/lib/permissions"
 import { useUserRole } from "@/hooks/use-user-role"
 import { useUserInfo } from "@/hooks/use-user-info"
@@ -50,7 +40,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [nextCursor, setNextCursor] = useState<string | null>(null)
   const [loadingMore, setLoadingMore] = useState(false)
   const [total, setTotal] = useState(0)
-  const [emailToDelete, setEmailToDelete] = useState<Email | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
@@ -114,44 +103,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
     if (session) fetchEmails()
   }, [session, fetchEmails])
 
-  const handleDelete = async (email: Email) => {
-    try {
-      const response = await fetch(`/api/emails/${email.id}`, {
-        method: "DELETE"
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        toast({
-          title: "错误",
-          description: (data as { error: string }).error,
-          variant: "destructive"
-        })
-        return
-      }
-
-      setEmails(prev => prev.filter(e => e.id !== email.id))
-      setTotal(prev => prev - 1)
-
-      toast({
-        title: "成功",
-        description: "邮箱已删除"
-      })
-      
-      if (selectedEmailId === email.id) {
-        onEmailSelect(null)
-      }
-    } catch {
-      toast({
-        title: "错误",
-        description: "删除邮箱失败",
-        variant: "destructive"
-      })
-    } finally {
-      setEmailToDelete(null)
-    }
-  }
-
   if (!session) return null
 
   return (
@@ -212,17 +163,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
                       )}
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 h-8 w-8"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setEmailToDelete(email)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
                 </div>
               ))}
               {loadingMore && (
@@ -245,26 +185,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
           )}
         </div>
       </div>
-
-      <AlertDialog open={!!emailToDelete} onOpenChange={() => setEmailToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>
-              确定要删除邮箱 {emailToDelete?.address} 吗？此操作将同时删除该邮箱中的所有邮件，且不可恢复。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={() => emailToDelete && handleDelete(emailToDelete)}
-            >
-              删除
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 } 
