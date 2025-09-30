@@ -7,7 +7,6 @@ import { Mail, RefreshCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useThrottle } from "@/hooks/use-throttle"
-import { useToast } from "@/components/ui/use-toast"
 import { ROLES } from "@/lib/permissions"
 import { useUserRole } from "@/hooks/use-user-role"
 import { useUserInfo } from "@/hooks/use-user-info"
@@ -41,7 +40,6 @@ export function EmailList({ onEmailSelect, selectedEmailId }: EmailListProps) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [total, setTotal] = useState(0)
   const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
 
   const fetchEmails = useCallback(async (cursor?: string) => {
     try {

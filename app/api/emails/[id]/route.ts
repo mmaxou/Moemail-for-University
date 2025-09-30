@@ -7,8 +7,8 @@ import { getUserId } from "@/lib/apiKey"
 export const runtime = "edge"
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  _request: Request,
+  { params: _params }: { params: Promise<{ id: string }> }
 ) {
   // 邮箱删除功能已被禁用
   return NextResponse.json(
