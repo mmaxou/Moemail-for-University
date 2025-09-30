@@ -6,10 +6,7 @@ import { encodeCursor, decodeCursor } from "@/lib/cursor"
 import { getUserId } from "@/lib/apiKey"
 export const runtime = "edge"
 
-export async function DELETE(
-  _request: Request,
-  { params: _params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE() {
   // 邮箱删除功能已被禁用
   return NextResponse.json(
     { error: "邮箱删除功能已被管理员禁用" },
