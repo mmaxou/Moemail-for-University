@@ -547,31 +547,11 @@ export function PromotePanel() {
                 todayUsers.map((user) => (
                   <div 
                     key={user.id} 
-                    className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-primary/10 cursor-pointer"
-                    onClick={() => {
-                      setSearchText(user.username || user.email || "")
-                      setFoundUser({
-                        id: user.id,
-                        name: user.name,
-                        username: user.username,
-                        email: user.email,
-                        role: user.role,
-                      })
-                    }}
+                    className="py-1 px-2"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium">
-                        {user.username || user.email || user.name || "未知用户"}
-                      </span>
-                      {user.name && user.username && (
-                        <span className="text-xs text-muted-foreground">
-                          ({user.name})
-                        </span>
-                      )}
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {roleNames[user.role as keyof typeof roleNames] || user.role}
-                    </Badge>
+                    <span className="text-xs">
+                      {user.username || user.email || user.name || "未知用户"}
+                    </span>
                   </div>
                 ))
               )}
@@ -592,16 +572,14 @@ export function PromotePanel() {
           </div>
         )}
 
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Input
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="输入用户名或邮箱"
-              disabled={loading}
-              className="h-8 text-sm"
-            />
-          </div>
+        <div className="flex gap-2 items-center">
+          <Input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="用户名或邮箱"
+            disabled={loading}
+            className="h-8 text-sm w-36"
+          />
           <Button
             onClick={handleSearch}
             disabled={!searchText.trim() || loading}
@@ -610,6 +588,34 @@ export function PromotePanel() {
           >
             查询
           </Button>
+          <div className="flex gap-1.5 items-center">
+            <span className="text-xs text-muted-foreground">设置为</span>
+            <Select value={targetRole} onValueChange={(value) => setTargetRole(value as RoleWithoutEmperor)}>
+              <SelectTrigger className="w-28 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ROLES.DUKE}>
+                  <div className="flex items-center gap-1.5">
+                    <Gem className="w-3 h-3" />
+                    <span className="text-xs">教授</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value={ROLES.KNIGHT}>
+                  <div className="flex items-center gap-1.5">
+                    <Sword className="w-3 h-3" />
+                    <span className="text-xs">认证学生</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value={ROLES.CIVILIAN}>
+                  <div className="flex items-center gap-1.5">
+                    <User2 className="w-3 h-3" />
+                    <span className="text-xs">未认证</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Button
             onClick={handleAction}
             disabled={loading || !searchText.trim() || !foundUser}
@@ -622,35 +628,6 @@ export function PromotePanel() {
               `设为${roleNames[targetRole as keyof typeof roleNames]}`
             )}
           </Button>
-        </div>
-
-        <div className="flex gap-2 items-center">
-          <div className="text-xs text-muted-foreground">设置为：</div>
-          <Select value={targetRole} onValueChange={(value) => setTargetRole(value as RoleWithoutEmperor)}>
-            <SelectTrigger className="w-28 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ROLES.DUKE}>
-                <div className="flex items-center gap-1.5">
-                  <Gem className="w-3 h-3" />
-                  <span className="text-xs">教授</span>
-                </div>
-              </SelectItem>
-              <SelectItem value={ROLES.KNIGHT}>
-                <div className="flex items-center gap-1.5">
-                  <Sword className="w-3 h-3" />
-                  <span className="text-xs">认证学生</span>
-                </div>
-              </SelectItem>
-              <SelectItem value={ROLES.CIVILIAN}>
-                <div className="flex items-center gap-1.5">
-                  <User2 className="w-3 h-3" />
-                  <span className="text-xs">未认证</span>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>
