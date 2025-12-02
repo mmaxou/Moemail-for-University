@@ -11,3 +11,17 @@ export const authSchema = z.object({
 })
 
 export type AuthSchema = z.infer<typeof authSchema>
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string()
+    .min(1, "请输入当前密码"),
+  newPassword: z.string()
+    .min(8, "新密码长度必须大于等于8位"),
+  confirmPassword: z.string()
+    .min(1, "请确认新密码")
+}).refine(data => data.newPassword === data.confirmPassword, {
+  message: "两次输入的密码不一致",
+  path: ["confirmPassword"]
+})
+
+export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>

@@ -3,26 +3,17 @@ import { NextResponse } from "next/server"
 import { PERMISSIONS } from "@/lib/permissions"
 import { checkPermission } from "@/lib/auth"
 import { Permission } from "@/lib/permissions"
-import { handleApiKeyAuth } from "@/lib/apiKey"
 
 const API_PERMISSIONS: Record<string, Permission> = {
   '/api/emails': PERMISSIONS.MANAGE_EMAIL,
   '/api/webhook': PERMISSIONS.MANAGE_WEBHOOK,
   '/api/roles/promote': PERMISSIONS.PROMOTE_USER,
   '/api/config': PERMISSIONS.MANAGE_CONFIG,
-  '/api/api-keys': PERMISSIONS.MANAGE_API_KEY,
   '/api/announcements': PERMISSIONS.MANAGE_ANNOUNCEMENT,
 }
 
 export async function middleware(request: Request) {
   const pathname = new URL(request.url).pathname
-
-  // API Key 认证
-  request.headers.delete("X-User-Id")
-  const apiKey = request.headers.get("X-API-Key")
-  if (apiKey) {
-    return handleApiKeyAuth(apiKey, pathname)
-  }
 
   // Session 认证
   const session = await auth()
@@ -64,7 +55,6 @@ export const config = {
     '/api/webhook/:path*',
     '/api/roles/:path*',
     '/api/config/:path*',
-    '/api/api-keys/:path*',
     '/api/announcements/:path*',
   ]
 } 

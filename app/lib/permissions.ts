@@ -12,7 +12,6 @@ export const PERMISSIONS = {
   MANAGE_WEBHOOK: 'manage_webhook',
   PROMOTE_USER: 'promote_user',
   MANAGE_CONFIG: 'manage_config',
-  MANAGE_API_KEY: 'manage_api_key',
   MANAGE_ANNOUNCEMENT: 'manage_announcement',
 } as const;
 
@@ -23,7 +22,6 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   [ROLES.DUKE]: [
     PERMISSIONS.MANAGE_EMAIL,
     PERMISSIONS.MANAGE_WEBHOOK,
-    PERMISSIONS.MANAGE_API_KEY,
     PERMISSIONS.MANAGE_ANNOUNCEMENT,
   ],
   [ROLES.KNIGHT]: [

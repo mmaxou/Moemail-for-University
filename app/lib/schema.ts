@@ -108,13 +108,6 @@ export const apiKeys = sqliteTable('api_keys', {
   nameUserIdUnique: uniqueIndex('name_user_id_unique').on(table.name, table.userId)
 }));
 
-export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
-  user: one(users, {
-    fields: [apiKeys.userId],
-    references: [users.id],
-  }),
-}));
-
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
   user: one(users, {
     fields: [userRoles.userId],
@@ -128,7 +121,6 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
 
 export const usersRelations = relations(users, ({ many }) => ({
   userRoles: many(userRoles),
-  apiKeys: many(apiKeys),
 }));
 
 export const announcements = sqliteTable('announcement', {

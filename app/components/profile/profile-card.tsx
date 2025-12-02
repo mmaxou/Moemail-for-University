@@ -11,8 +11,8 @@ import { PromotePanel } from "./promote-panel"
 import { useRolePermission } from "@/hooks/use-role-permission"
 import { PERMISSIONS } from "@/lib/permissions"
 import { ConfigPanel } from "./config-panel"
-import { ApiKeyPanel } from "./api-key-panel"
 import { AnnouncementPanel } from "./announcement-panel"
+import { ChangePasswordPanel } from "./change-password-panel"
 
 interface ProfileCardProps {
   user: User
@@ -100,8 +100,9 @@ export function ProfileCard({ user }: ProfileCardProps) {
 
       {canManageConfig && <ConfigPanel />}
       {canPromote && <PromotePanel />}
-      {canManageWebhook && <ApiKeyPanel />}
       {canManageAnnouncement && <AnnouncementPanel />}
+
+      <ChangePasswordPanel hasPassword={user.hasPassword ?? false} />
 
       <div className="flex flex-col sm:flex-row gap-4 px-1">
         <Button 

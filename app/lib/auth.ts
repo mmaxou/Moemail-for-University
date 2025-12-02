@@ -162,6 +162,14 @@ export const {
         token.name = user.name || user.username
         token.username = user.username
         token.image = user.image || generateAvatarUrl(token.name as string)
+        
+        // 查询用户是否有密码
+        const db = createDb()
+        const dbUser = await db.query.users.findFirst({
+          where: eq(users.id, user.id as string),
+          columns: { password: true }
+        })
+        token.hasPassword = !!dbUser?.password
       }
       return token
     },
@@ -171,6 +179,7 @@ export const {
         session.user.name = token.name as string
         session.user.username = token.username as string
         session.user.image = token.image as string
+        session.user.hasPassword = token.hasPassword as boolean
 
         const db = createDb()
         let userRoleRecords = await db.query.userRoles.findMany({

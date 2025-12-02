@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Gem, Sword, User2, Loader2, AlertCircle, Users, Trash, Mail, Edit, Check, X } from "lucide-react"
+import { Gem, Sword, User2, Loader2, AlertCircle, Users, Trash, Mail, Edit, Check, X, UserPlus, ChevronDown, ChevronUp } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
@@ -70,6 +70,16 @@ export function PromotePanel() {
   const [editingMaxEmails, setEditingMaxEmails] = useState(false)
   const [newMaxEmails, setNewMaxEmails] = useState<number>(1)
   const [updatingMaxEmails, setUpdatingMaxEmails] = useState(false)
+  const [todayUsers, setTodayUsers] = useState<{
+    id: string;
+    name?: string;
+    username?: string;
+    email?: string;
+    role: string;
+    createdAt?: Date;
+  }[]>([])
+  const [loadingTodayUsers, setLoadingTodayUsers] = useState(false)
+  const [showTodayUsers, setShowTodayUsers] = useState(false)
 
   // 定义API响应类型
   type SearchResponse = {
@@ -107,7 +117,30 @@ export function PromotePanel() {
   // 初始化时获取角色统计
   useEffect(() => {
     fetchRoleStats()
+    fetchTodayUsers()
   }, [])
+
+  // 获取今日注册用户
+  const fetchTodayUsers = async () => {
+    try {
+      setLoadingTodayUsers(true)
+      const response = await fetch("/api/roles/today-users")
+      
+      if (!response.ok) {
+        throw new Error("获取今日注册用户失败")
+      }
+      
+      const data = await response.json() as { 
+        users: typeof todayUsers;
+        count: number;
+      }
+      setTodayUsers(data.users || [])
+    } catch (error) {
+      console.error("获取今日注册用户失败:", error)
+    } finally {
+      setLoadingTodayUsers(false)
+    }
+  }
 
   // 简单搜索用户，不使用debounce
   const handleSearch = async () => {
@@ -472,6 +505,80 @@ export function PromotePanel() {
       </Card>
 
       <div className="space-y-3">
+        {/* 今日注册用户列表 */}
+        <Card className="p-4 bg-primary/5">
+          <div className="flex items-center justify-between mb-2">
+            <button
+              type="button"
+              className="flex items-center gap-2 hover:text-primary transition-colors"
+              onClick={() => setShowTodayUsers(!showTodayUsers)}
+            >
+              <UserPlus className="w-4 h-4" />
+              <h3 className="font-medium text-sm">今日注册用户</h3>
+              <Badge variant="secondary" className="ml-1">{todayUsers.length}</Badge>
+              {showTodayUsers ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={fetchTodayUsers}
+              disabled={loadingTodayUsers}
+              className="h-6 w-6"
+            >
+              <Loader2 className={`w-3 h-3 ${loadingTodayUsers ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+          
+          {showTodayUsers && (
+            <div className="mt-2 space-y-1 max-h-48 overflow-y-auto">
+              {loadingTodayUsers ? (
+                <div className="text-center py-2 text-sm text-muted-foreground">
+                  加载中...
+                </div>
+              ) : todayUsers.length === 0 ? (
+                <div className="text-center py-2 text-sm text-muted-foreground">
+                  今日暂无新注册用户
+                </div>
+              ) : (
+                todayUsers.map((user) => (
+                  <div 
+                    key={user.id} 
+                    className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-primary/10 cursor-pointer"
+                    onClick={() => {
+                      setSearchText(user.username || user.email || "")
+                      setFoundUser({
+                        id: user.id,
+                        name: user.name,
+                        username: user.username,
+                        email: user.email,
+                        role: user.role,
+                      })
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium">
+                        {user.username || user.email || user.name || "未知用户"}
+                      </span>
+                      {user.name && user.username && (
+                        <span className="text-xs text-muted-foreground">
+                          ({user.name})
+                        </span>
+                      )}
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      {roleNames[user.role as keyof typeof roleNames] || user.role}
+                    </Badge>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </Card>
+
         {/* 用户信息显示区域 */}
         {foundUser && renderUserInfo()}
 
@@ -503,6 +610,18 @@ export function PromotePanel() {
           >
             查询
           </Button>
+          <Button
+            onClick={handleAction}
+            disabled={loading || !searchText.trim() || !foundUser}
+            size="sm"
+            className="h-8 px-3 text-xs"
+          >
+            {loading ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              `设为${roleNames[targetRole as keyof typeof roleNames]}`
+            )}
+          </Button>
         </div>
 
         <div className="flex gap-2 items-center">
@@ -533,19 +652,6 @@ export function PromotePanel() {
             </SelectContent>
           </Select>
         </div>
-
-        <Button
-          onClick={handleAction}
-          disabled={loading || !searchText.trim() || !foundUser}
-          size="sm"
-          className="w-full h-8 text-xs"
-        >
-          {loading ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            `设为${roleNames[targetRole as keyof typeof roleNames]}`
-          )}
-        </Button>
       </div>
     </div>
   )
