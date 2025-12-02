@@ -71,12 +71,12 @@ export function ChangePasswordPanel({ hasPassword }: ChangePasswordPanelProps) {
         })
       })
 
-      const data = await res.json()
+      const data = await res.json() as { error?: string }
 
       if (!res.ok) {
         toast({
           title: "修改失败",
-          description: data.error || "请稍后重试",
+          description: data?.error || "请稍后重试",
           variant: "destructive"
         })
         return

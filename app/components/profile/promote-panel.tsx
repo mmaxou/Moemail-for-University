@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Gem, Sword, User2, Loader2, AlertCircle, Users, Trash, Mail, Edit, Check, X, UserPlus, ChevronDown, ChevronUp } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { ROLES, Role } from "@/lib/permissions"
 import {
@@ -96,15 +96,15 @@ export function PromotePanel() {
   };
 
   // 获取角色统计数据
-  const fetchRoleStats = async () => {
+  const fetchRoleStats = useCallback(async () => {
     try {
       setLoadingStats(true)
       const response = await fetch("/api/roles/stats")
-      
+
       if (!response.ok) {
         throw new Error("获取统计数据失败")
       }
-      
+
       const data = await response.json()
       setRoleStats(data as RoleStats)
     } catch (error) {
@@ -112,25 +112,25 @@ export function PromotePanel() {
     } finally {
       setLoadingStats(false)
     }
-  }
+  }, [])
 
-  // 初始化时获取角色统计
+  // 初始化时获取角色统计与今日用户
   useEffect(() => {
     fetchRoleStats()
     fetchTodayUsers()
-  }, [])
+  }, [fetchRoleStats, fetchTodayUsers])
 
   // 获取今日注册用户
-  const fetchTodayUsers = async () => {
+  const fetchTodayUsers = useCallback(async () => {
     try {
       setLoadingTodayUsers(true)
       const response = await fetch("/api/roles/today-users")
-      
+
       if (!response.ok) {
         throw new Error("获取今日注册用户失败")
       }
-      
-      const data = await response.json() as { 
+
+      const data = await response.json() as {
         users: typeof todayUsers;
         count: number;
       }
@@ -140,7 +140,7 @@ export function PromotePanel() {
     } finally {
       setLoadingTodayUsers(false)
     }
-  }
+  }, [])
 
   // 简单搜索用户，不使用debounce
   const handleSearch = async () => {
