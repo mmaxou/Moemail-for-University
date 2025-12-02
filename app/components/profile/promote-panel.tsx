@@ -114,12 +114,6 @@ export function PromotePanel() {
     }
   }, [])
 
-  // 初始化时获取角色统计与今日用户
-  useEffect(() => {
-    fetchRoleStats()
-    fetchTodayUsers()
-  }, [fetchRoleStats, fetchTodayUsers])
-
   // 获取今日注册用户
   const fetchTodayUsers = useCallback(async () => {
     try {
@@ -141,6 +135,12 @@ export function PromotePanel() {
       setLoadingTodayUsers(false)
     }
   }, [])
+
+  // 初始化时获取角色统计与今日用户
+  useEffect(() => {
+    fetchRoleStats()
+    fetchTodayUsers()
+  }, [fetchRoleStats, fetchTodayUsers])
 
   // 简单搜索用户，不使用debounce
   const handleSearch = async () => {
