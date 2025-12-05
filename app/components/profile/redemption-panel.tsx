@@ -58,12 +58,12 @@ export function RedemptionPanel() {
       })
 
       if (!res.ok) {
-        const data = await res.json()
+        const data = await res.json() as { error?: string }
         toast({ title: "错误", description: data.error, variant: "destructive" })
         return
       }
 
-      const data = await res.json()
+      const data = await res.json() as { codes: RedemptionCode[] }
       toast({ title: "成功", description: `已生成 ${data.codes.length} 个兑换码` })
       fetchCodes()
     } catch {
