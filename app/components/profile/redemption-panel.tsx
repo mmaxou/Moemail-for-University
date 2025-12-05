@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { Ticket, Copy, Loader2, Trash2 } from "lucide-react"
+import { Ticket, Copy, Loader2 } from "lucide-react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useCopy } from "@/hooks/use-copy"
 
@@ -45,6 +45,7 @@ export function RedemptionPanel() {
 
   useEffect(() => {
     fetchCodes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const generateCodes = async () => {

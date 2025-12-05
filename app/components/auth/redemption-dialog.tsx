@@ -19,7 +19,6 @@ export function RedemptionDialog({ open, onOpenChange, onSuccess }: RedemptionDi
   const [emailPrefix, setEmailPrefix] = useState("")
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'code' | 'prefix'>('code')
-  const [codeType, setCodeType] = useState<'A' | 'B' | null>(null)
   const { toast } = useToast()
 
   const handleSubmitCode = async () => {
@@ -41,7 +40,6 @@ export function RedemptionDialog({ open, onOpenChange, onSuccess }: RedemptionDi
       if (!response.ok) {
         // 如果是类型B且需要邮箱前缀
         if (data.needPrefix) {
-          setCodeType('B')
           setStep('prefix')
           setLoading(false)
           return
