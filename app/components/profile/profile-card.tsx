@@ -13,6 +13,7 @@ import { PERMISSIONS } from "@/lib/permissions"
 import { ConfigPanel } from "./config-panel"
 import { AnnouncementPanel } from "./announcement-panel"
 import { ChangePasswordPanel } from "./change-password-panel"
+import { RedemptionPanel } from "./redemption-panel"
 
 interface ProfileCardProps {
   user: User
@@ -100,6 +101,7 @@ export function ProfileCard({ user }: ProfileCardProps) {
 
       {canManageConfig && <ConfigPanel />}
       {canPromote && <PromotePanel />}
+      {canPromote && <RedemptionPanel />}
       {canManageAnnouncement && <AnnouncementPanel />}
 
       <ChangePasswordPanel hasPassword={user.hasPassword ?? false} />

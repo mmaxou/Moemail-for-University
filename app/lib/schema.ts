@@ -153,3 +153,17 @@ export const dailyEmailStats = sqliteTable('daily_email_stats', {
 export const rolesRelations = relations(roles, ({ many }) => ({
   userRoles: many(userRoles),
 }));
+
+// 兑换码表
+export const redemptionCodes = sqliteTable('redemption_code', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  code: text('code').notNull().unique(), // 兑换码
+  type: text('type').notNull(), // 'A' = 自动创建邮箱, 'B' = 自定义邮箱前缀
+  used: integer('used', { mode: 'boolean' }).notNull().default(false),
+  usedBy: text('used_by').references(() => users.id), // 使用者
+  usedAt: integer('used_at', { mode: 'timestamp_ms' }), // 使用时间
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  createdBy: text('created_by').references(() => users.id), // 创建者（管理员）
+});

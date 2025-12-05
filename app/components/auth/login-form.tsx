@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tabs"
 import { Github, Loader2, KeyRound, User2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { RedemptionDialog } from "./redemption-dialog"
 
 interface FormErrors {
   username?: string
@@ -33,6 +34,7 @@ export function LoginForm() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
+  const [showRedemption, setShowRedemption] = useState(false)
   const { toast } = useToast()
 
   const validateLoginForm = () => {
@@ -129,7 +131,9 @@ export function LoginForm() {
         return
       }
 
-      window.location.href = "/"
+      // 注册成功后显示兑换码弹窗
+      setLoading(false)
+      setShowRedemption(true)
     } catch (error) {
       toast({
         title: "注册失败",
@@ -339,6 +343,12 @@ export function LoginForm() {
           </div>
         </Tabs>
       </CardContent>
+
+      <RedemptionDialog 
+        open={showRedemption} 
+        onOpenChange={setShowRedemption}
+        onSuccess={() => window.location.href = "/"}
+      />
     </Card>
   )
 }

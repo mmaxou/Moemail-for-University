@@ -120,6 +120,13 @@
       "when": 1741491400000,
       "tag": "0016_add_daily_email_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1733491500000,
+      "tag": "0017_add_redemption_codes",
+      "breakpoints": true
     }
   ]
 }
