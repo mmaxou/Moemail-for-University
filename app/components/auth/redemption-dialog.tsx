@@ -35,7 +35,7 @@ export function RedemptionDialog({ open, onOpenChange, onSuccess }: RedemptionDi
         body: JSON.stringify({ code: code.trim() })
       })
 
-      const data = await response.json()
+      const data = await response.json() as { needPrefix?: boolean; error?: string; message?: string }
 
       if (!response.ok) {
         // 如果是类型B且需要邮箱前缀
@@ -44,12 +44,12 @@ export function RedemptionDialog({ open, onOpenChange, onSuccess }: RedemptionDi
           setLoading(false)
           return
         }
-        toast({ title: "错误", description: data.error, variant: "destructive" })
+        toast({ title: "错误", description: data.error || "兑换失败", variant: "destructive" })
         setLoading(false)
         return
       }
 
-      toast({ title: "成功", description: data.message })
+      toast({ title: "成功", description: data.message || "兑换成功" })
       onOpenChange(false)
       onSuccess?.()
       window.location.reload()
@@ -79,14 +79,14 @@ export function RedemptionDialog({ open, onOpenChange, onSuccess }: RedemptionDi
         body: JSON.stringify({ code: code.trim(), emailPrefix: emailPrefix.trim() })
       })
 
-      const data = await response.json()
+      const data = await response.json() as { error?: string; message?: string }
 
       if (!response.ok) {
-        toast({ title: "错误", description: data.error, variant: "destructive" })
+        toast({ title: "错误", description: data.error || "兑换失败", variant: "destructive" })
         return
       }
 
-      toast({ title: "成功", description: data.message })
+      toast({ title: "成功", description: data.message || "兑换成功" })
       onOpenChange(false)
       onSuccess?.()
       window.location.reload()
