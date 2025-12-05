@@ -33,7 +33,7 @@ export function RedemptionPanel() {
     try {
       const res = await fetch("/api/redemption")
       if (res.ok) {
-        const data = await res.json()
+        const data = await res.json() as RedemptionCode[]
         setCodes(data)
       }
     } catch {
