@@ -4,9 +4,8 @@ import { User } from "next-auth"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { signOut } from "next-auth/react"
-import { Github, Mail, Settings, Crown, Sword, User2, Gem } from "lucide-react"
+import { Github, Mail, Crown, Sword, User2, Gem } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { WebhookConfig } from "./webhook-config"
 import { PromotePanel } from "./promote-panel"
 import { useRolePermission } from "@/hooks/use-role-permission"
 import { PERMISSIONS } from "@/lib/permissions"
@@ -29,7 +28,6 @@ const roleConfigs = {
 export function ProfileCard({ user }: ProfileCardProps) {
   const router = useRouter()
   const { checkPermission } = useRolePermission()
-  const canManageWebhook = checkPermission(PERMISSIONS.MANAGE_WEBHOOK)
   const canPromote = checkPermission(PERMISSIONS.PROMOTE_USER)
   const canManageConfig = checkPermission(PERMISSIONS.MANAGE_CONFIG)
   const canManageAnnouncement = checkPermission(PERMISSIONS.MANAGE_ANNOUNCEMENT)
@@ -88,16 +86,6 @@ export function ProfileCard({ user }: ProfileCardProps) {
           </div>
         </div>
       </div>
-
-      {canManageWebhook && (
-        <div className="bg-background rounded-lg border-2 border-primary/20 p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Settings className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Webhook 配置</h2>
-          </div>
-          <WebhookConfig />
-        </div>
-      )}
 
       {canManageConfig && <ConfigPanel />}
       {canPromote && <PromotePanel />}

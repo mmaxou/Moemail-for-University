@@ -9,7 +9,6 @@ export type Role = typeof ROLES[keyof typeof ROLES];
 
 export const PERMISSIONS = {
   MANAGE_EMAIL: 'manage_email',
-  MANAGE_WEBHOOK: 'manage_webhook',
   PROMOTE_USER: 'promote_user',
   MANAGE_CONFIG: 'manage_config',
   MANAGE_ANNOUNCEMENT: 'manage_announcement',
@@ -21,11 +20,9 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   [ROLES.EMPEROR]: Object.values(PERMISSIONS),
   [ROLES.DUKE]: [
     PERMISSIONS.MANAGE_EMAIL,
-    PERMISSIONS.MANAGE_WEBHOOK,
   ],
   [ROLES.KNIGHT]: [
     PERMISSIONS.MANAGE_EMAIL,
-    PERMISSIONS.MANAGE_WEBHOOK,
   ],
   // 普通用户（CIVILIAN）不具备任何管理权限
   [ROLES.CIVILIAN]: [],

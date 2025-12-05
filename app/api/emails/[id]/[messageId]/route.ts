@@ -58,6 +58,44 @@ export async function DELETE(
   }
 }
 
+// 切换收藏状态
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string; messageId: string }> }
+) {
+  const userId = await getUserId()
+  const { id, messageId } = await params
+
+  try {
+    const db = createDb()
+    const email = await db.query.emails.findFirst({
+      where: and(eq(emails.id, id), eq(emails.userId, userId!))
+    })
+
+    if (!email) {
+      return NextResponse.json({ error: "无权限" }, { status: 403 })
+    }
+
+    const message = await db.query.messages.findFirst({
+      where: and(eq(messages.id, messageId), eq(messages.emailId, id))
+    })
+
+    if (!message) {
+      return NextResponse.json({ error: "邮件不存在" }, { status: 404 })
+    }
+
+    const newStarred = !message.starred
+    await db.update(messages)
+      .set({ starred: newStarred })
+      .where(eq(messages.id, messageId))
+
+    return NextResponse.json({ starred: newStarred })
+  } catch (error) {
+    console.error('Failed to toggle star:', error)
+    return NextResponse.json({ error: "操作失败" }, { status: 500 })
+  }
+}
+
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string; messageId: string }> }) {
   try {
     const { id, messageId } = await params
@@ -101,6 +139,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         content: message.content,
         html: message.html,
         type: message.type,
+        starred: message.starred,
         received_at: message.receivedAt.getTime()
       }
     })

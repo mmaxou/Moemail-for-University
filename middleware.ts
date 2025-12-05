@@ -6,7 +6,6 @@ import { Permission } from "@/lib/permissions"
 
 const API_PERMISSIONS: Record<string, Permission> = {
   '/api/emails': PERMISSIONS.MANAGE_EMAIL,
-  '/api/webhook': PERMISSIONS.MANAGE_WEBHOOK,
   '/api/roles/promote': PERMISSIONS.PROMOTE_USER,
   '/api/config': PERMISSIONS.MANAGE_CONFIG,
   '/api/announcements': PERMISSIONS.MANAGE_ANNOUNCEMENT,
@@ -58,7 +57,6 @@ export async function middleware(request: Request) {
 export const config = {
   matcher: [
     '/api/emails/:path*',
-    '/api/webhook/:path*',
     '/api/roles/:path*',
     '/api/config/:path*',
     '/api/announcements/:path*',

@@ -111,12 +111,8 @@ export async function POST(request: Request) {
   // 更新用户邮箱配额
   await db.update(users).set({ maxEmails: 1 }).where(eq(users.id, userId))
 
-  // 标记兑换码已使用
-  await db.update(redemptionCodes).set({
-    used: true,
-    usedBy: userId,
-    usedAt: new Date()
-  }).where(eq(redemptionCodes.id, redemption.id))
+  // 删除已使用的兑换码
+  await db.delete(redemptionCodes).where(eq(redemptionCodes.id, redemption.id))
 
   return NextResponse.json({
     success: true,

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback, useMemo } from "react"
-import {Mail, Calendar, RefreshCw, Trash2, Search, Send, Trash, Inbox, SendHorizontal} from "lucide-react"
+import {Mail, Calendar, RefreshCw, Trash2, Search, Send, Trash, Inbox, SendHorizontal, Star} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useThrottle } from "@/hooks/use-throttle"
@@ -24,8 +24,9 @@ interface Message {
   from_address: string
   subject: string
   received_at: number
-  type?: 'sent' | 'received' // 添加类型字段，用于区分发件和收件
-  to_address?: string // 发件时的收件人地址
+  type?: 'sent' | 'received'
+  to_address?: string
+  starred?: boolean
 }
 
 interface MessageListProps {
@@ -62,8 +63,21 @@ export const MessageList = forwardRef<MessageListRef, MessageListProps>(function
   const [filteredMessages, setFilteredMessages] = useState<Message[]>([])
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false)
   const [deletingAll, setDeletingAll] = useState(false)
-  const [messageType, setMessageType] = useState<'all' | 'received' | 'sent'>('all') // 邮件类型过滤
+  const [messageType, setMessageType] = useState<'all' | 'received' | 'sent' | 'starred'>('all')
   const { toast } = useToast()
+
+  const handleToggleStar = async (message: Message, e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      const res = await fetch(`/api/emails/${email.id}/${message.id}`, { method: 'PATCH' })
+      if (res.ok) {
+        const { starred } = await res.json() as { starred: boolean }
+        setMessages((prev: Message[]) => prev.map((m: Message) => m.id === message.id ? { ...m, starred } : m))
+      }
+    } catch {
+      toast({ title: "错误", description: "操作失败", variant: "destructive" })
+    }
+  }
 
   // 当 messages 改变时更新 ref
   useEffect(() => {
@@ -78,7 +92,9 @@ export const MessageList = forwardRef<MessageListRef, MessageListProps>(function
   // 根据邮件类型过滤消息
   const typeFilteredMessages = messageType === 'all'
     ? allMessages
-    : allMessages.filter((message: Message) => message.type === messageType)
+    : messageType === 'starred'
+      ? allMessages.filter((message: Message) => message.starred)
+      : allMessages.filter((message: Message) => message.type === messageType)
 
   // 当搜索条件或邮件类型变化时更新过滤后的消息列表
   useEffect(() => {
@@ -316,6 +332,15 @@ export const MessageList = forwardRef<MessageListRef, MessageListProps>(function
             <SendHorizontal className="w-3 h-3 mr-1" />
             发件箱
           </Button>
+          <Button
+            variant={messageType === 'starred' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setMessageType('starred')}
+            className="h-7 px-3 text-xs"
+          >
+            <Star className="w-3 h-3 mr-1" />
+            收藏
+          </Button>
         </div>
       </div>
 
@@ -410,7 +435,16 @@ export const MessageList = forwardRef<MessageListRef, MessageListProps>(function
                       </span>
                     </div>
                   </div>
-                  <Button
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => handleToggleStar(message, e)}
+                    >
+                      <Star className={cn("h-4 w-4", message.starred ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground")} />
+                    </Button>
+                    <Button
                       variant="ghost"
                       size="icon"
                       className="opacity-0 group-hover:opacity-100 h-8 w-8"
@@ -418,9 +452,10 @@ export const MessageList = forwardRef<MessageListRef, MessageListProps>(function
                         e.stopPropagation()
                         setMessageToDelete(message)
                       }}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}

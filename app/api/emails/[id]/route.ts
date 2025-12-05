@@ -172,6 +172,7 @@ export async function GET(
         to_address: msg.toAddress,
         subject: msg.subject,
         type: msg.type,
+        starred: msg.starred,
         received_at: msg.receivedAt.getTime()
       })),
       nextCursor,

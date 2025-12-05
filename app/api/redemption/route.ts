@@ -5,11 +5,11 @@ import { nanoid } from "nanoid"
 import { getUserId } from "@/lib/apiKey"
 import { checkPermission } from "@/lib/auth"
 import { PERMISSIONS } from "@/lib/permissions"
-import { desc } from "drizzle-orm"
+import { desc, eq } from "drizzle-orm"
 
 export const runtime = "edge"
 
-// 获取兑换码列表（管理员）
+// 获取兑换码列表（管理员）- 只返回未使用的
 export async function GET() {
   const hasAccess = await checkPermission(PERMISSIONS.PROMOTE_USER)
   if (!hasAccess) {
@@ -18,6 +18,7 @@ export async function GET() {
 
   const db = createDb()
   const codes = await db.query.redemptionCodes.findMany({
+    where: eq(redemptionCodes.used, false),
     orderBy: [desc(redemptionCodes.createdAt)]
   })
 

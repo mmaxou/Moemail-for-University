@@ -127,6 +127,13 @@
       "when": 1733491500000,
       "tag": "0017_add_redemption_codes",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1733491600000,
+      "tag": "0018_add_message_starred",
+      "breakpoints": true
     }
   ]
 }

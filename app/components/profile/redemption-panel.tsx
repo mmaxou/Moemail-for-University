@@ -13,9 +13,6 @@ interface RedemptionCode {
   id: string
   code: string
   type: 'A' | 'B'
-  used: boolean
-  usedBy: string | null
-  usedAt: string | null
   createdAt: string
 }
 
@@ -73,11 +70,11 @@ export function RedemptionPanel() {
     }
   }
 
-  const copyAllUnused = () => {
-    const unusedCodes = codes.filter(c => !c.used).map(c => c.code).join('\n')
-    if (unusedCodes) {
-      copyToClipboard(unusedCodes)
-      toast({ title: "已复制", description: "未使用的兑换码已复制到剪贴板" })
+  const copyAllCodes = () => {
+    const allCodes = codes.map(c => c.code).join('\n')
+    if (allCodes) {
+      copyToClipboard(allCodes)
+      toast({ title: "已复制", description: "兑换码已复制到剪贴板" })
     }
   }
 
@@ -125,11 +122,11 @@ export function RedemptionPanel() {
         <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">
-              共 {codes.length} 个兑换码，{codes.filter(c => !c.used).length} 个未使用
+              共 {codes.length} 个未使用兑换码
             </span>
-            <Button variant="outline" size="sm" onClick={copyAllUnused}>
+            <Button variant="outline" size="sm" onClick={copyAllCodes}>
               <Copy className="w-4 h-4 mr-1" />
-              复制未使用
+              复制全部
             </Button>
           </div>
 
@@ -142,9 +139,7 @@ export function RedemptionPanel() {
               {codes.map((code) => (
                 <div
                   key={code.id}
-                  className={`flex items-center justify-between p-2 rounded border ${
-                    code.used ? 'bg-muted/50 opacity-60' : 'bg-background'
-                  }`}
+                  className="flex items-center justify-between p-2 rounded border bg-background"
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-xs px-1.5 py-0.5 rounded ${
@@ -153,9 +148,6 @@ export function RedemptionPanel() {
                       {code.type}
                     </span>
                     <code className="font-mono text-sm">{code.code}</code>
-                    {code.used && (
-                      <span className="text-xs text-muted-foreground">已使用</span>
-                    )}
                   </div>
                   <Button
                     variant="ghost"
